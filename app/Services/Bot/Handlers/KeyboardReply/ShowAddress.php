@@ -12,9 +12,7 @@ use TelegramBot\Api\Types\Update;
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  11.06.2019
  */
-class ShowAddress
-    extends AbstractUpdateHandler
-    implements KeyboardReplyHandlerInterface
+class ShowAddress extends AbstractUpdateHandler implements KeyboardReplyHandlerInterface
 {
     /**
      * @inheritDoc

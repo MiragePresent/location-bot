@@ -12,9 +12,7 @@ use TelegramBot\Api\Types\Update;
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  10.06.2019
  */
-class SearchByListUpdateHandler
-    extends AbstractUpdateHandler
-    implements CallbackQueryHandlerInterface
+class SearchByListUpdateHandler extends AbstractUpdateHandler implements CallbackQueryHandlerInterface
 {
     /**
      * Callback identity name
