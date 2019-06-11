@@ -14,7 +14,7 @@ class BotServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('bot', function () {
+        $this->app->bind(Bot::class, function () {
             return new Bot(config('bot.token'));
         });
     }
