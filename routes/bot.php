@@ -8,7 +8,7 @@
 $router->post("/", ['uses' => 'BotController@webHookCallback']);
 
 $router->get('/setwebhook', function (\App\Services\Bot\Bot $bot) {
-    $ngrok = "https://4a684427.ngrok.io";
+    $ngrok = "https://ac5758d1.ngrok.io";
 
     $response = $bot->getApi()->setWebhook($ngrok . "/bot");
 

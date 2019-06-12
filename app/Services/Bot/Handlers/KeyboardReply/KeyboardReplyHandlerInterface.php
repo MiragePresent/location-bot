@@ -2,6 +2,8 @@
 
 namespace App\Services\Bot\Handlers\KeyboardReply;
 
+use TelegramBot\Api\Types\Message;
+
 /**
  * Interface KeyboardReplyHandlerInterface
  *
@@ -15,9 +17,9 @@ interface KeyboardReplyHandlerInterface
     /**
      * Checks if handler is suitable for this message reply
      *
-     * @param string $reply Message text
+     * @param Message $message
      *
      * @return bool
      */
-    public static function isSuitable(string $reply): bool;
+    public static function isSuitable(Message $message): bool;
 }

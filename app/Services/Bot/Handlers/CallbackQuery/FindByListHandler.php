@@ -7,19 +7,19 @@ use TelegramBot\Api\Types\ReplyKeyboardMarkup;
 use TelegramBot\Api\Types\Update;
 
 /**
- * Class SearchByListHandler
+ * Class FindByListHandler
  *
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  10.06.2019
  */
-class SearchByListUpdateHandler extends AbstractUpdateHandler implements CallbackQueryHandlerInterface
+class FindByListHandler extends AbstractUpdateHandler implements CallbackQueryHandlerInterface
 {
     /**
      * Callback identity name
      *
      * @var string
      */
-    public const CALLBACK_DATA = "search_by_location";
+    public const CALLBACK_DATA = "search_by_list";
 
     /**
      * @inheritDoc
@@ -42,9 +42,10 @@ class SearchByListUpdateHandler extends AbstractUpdateHandler implements Callbac
                 ["text" => "Донецька обл."],
                 ["text" => "Житомирська обл."],
             ]],
+            true,
             true
         );
 
-        $this->bot->reply($update->getCallbackQuery()->getMessage(), "Оберіть область із списку:", $kb);
+        $this->bot->reply($update->getCallbackQuery()->getMessage(), "В якій області ти шукаєш церкву?", $kb);
     }
 }

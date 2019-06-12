@@ -3,7 +3,8 @@
 namespace App\Services\Bot\Handlers\Commands;
 
 use App\Services\Bot\Bot;
-use App\Services\Bot\Handlers\CallbackQuery\SearchByListUpdateHandler;
+use App\Services\Bot\Handlers\CallbackQuery\FindByListHandler;
+use App\Services\Bot\Handlers\CallbackQuery\FindByLocationHandler;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
@@ -59,12 +60,13 @@ class CommandStartHandler implements CommandHandlerInterface
     {
         $byLocation = [
             "text" => "Знайти поблизу",
-            "callback_data" => Bot::CALLBACK_NAME_BY_LOCATION,
+            "callback_data" => FindByLocationHandler::CALLBACK_DATA,
+            "switch_inline_query" => "inline_query_by_location"
         ];
 
         $byCity = [
             "text" => "Вибрати із списку",
-            "callback_data" => SearchByListUpdateHandler::CALLBACK_DATA,
+            "callback_data" => FindByListHandler::CALLBACK_DATA,
         ];
 
         $keyboard = new InlineKeyboardMarkup([[ $byLocation, $byCity ]]);

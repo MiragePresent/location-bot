@@ -2,11 +2,13 @@
 
 namespace App\Services\Bot;
 
-use App\Services\Bot\Handlers\CallbackQuery\SearchByListUpdateHandler;
+use App\Services\Bot\Handlers\CallbackQuery\FindByListHandler;
+use App\Services\Bot\Handlers\CallbackQuery\FindByLocationHandler;
 use App\Services\Bot\Handlers\Commands\CommandHandlerInterface;
 use App\Services\Bot\Handlers\Commands\CommandStartHandler;
+use App\Services\Bot\Handlers\KeyboardReply\FindTheNearestHandler;
 use App\Services\Bot\Handlers\KeyboardReply\KeyboardReplyHandlerInterface;
-use App\Services\Bot\Handlers\KeyboardReply\SearchInRegionUpdateHandler;
+use App\Services\Bot\Handlers\KeyboardReply\FindInRegionHandler;
 use App\Services\Bot\Handlers\KeyboardReply\ShowAddress;
 use App\Services\Bot\Handlers\KeyboardReply\ShowByCity;
 use App\Services\Bot\Handlers\UpdateHandlerInterface;
@@ -15,6 +17,7 @@ use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
+use TelegramBot\Api\Types\Inline\QueryResult\Venue;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 
@@ -59,7 +62,8 @@ class Bot
     ];
 
     protected $replyHandlers = [
-        SearchInRegionUpdateHandler::class,
+        FindTheNearestHandler::class,
+        FindInRegionHandler::class,
         ShowByCity::class,
         ShowAddress::class,
     ];
@@ -86,14 +90,20 @@ class Bot
     {
         $handler = null;
 
-        if ($this->isCallbackQuery($update)) {
-            if ($update->getCallbackQuery()->getData() === SearchByListUpdateHandler::CALLBACK_DATA) {
-                $handler = new SearchByListUpdateHandler($this);
+        if ($this->isInlineQuery($update)) {
+            $church = new Venue(623847, 50.7419858, 25.2792952, "Луцьк I", "Владимирская ул., 89б, Луцк, Волынская область, 45624");
+
+            $this->api->answerInlineQuery($update->getInlineQuery()->getId(), [$church]);
+        } elseif ($this->isCallbackQuery($update)) {
+            if ($update->getCallbackQuery()->getData() === FindByListHandler::CALLBACK_DATA) {
+                $handler = new FindByListHandler($this);
+            } elseif ($update->getCallbackQuery()->getData() === FindByLocationHandler::CALLBACK_DATA) {
+                $handler = new FindByLocationHandler($this);
             }
         } elseif ($this->isMessage($update)) {
             foreach ($this->replyHandlers as $handlerClass) {
                 /** @var KeyboardReplyHandlerInterface $handlerClass */
-                if ($handlerClass::isSuitable($update->getMessage()->getText())) {
+                if ($handlerClass::isSuitable($update->getMessage())) {
                     $handler = new $handlerClass($this);
                 }
             }
@@ -144,6 +154,18 @@ class Bot
     }
 
     /**
+     * Determines whether update is inline query
+     *
+     * @param Update $update
+     *
+     * @return bool
+     */
+    public function isInlineQuery(Update $update): bool
+    {
+        return !empty($update->getInlineQuery());
+    }
+
+    /**
      * Determines whether update is inline button event
      *
      * @param Update $update
@@ -162,7 +184,7 @@ class Bot
      *
      * @return bool
      */
-    public function isMessage(Update $update): bool
+    private function isMessage(Update $update): bool
     {
         return !empty($update->getMessage());
     }
