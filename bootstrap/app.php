@@ -21,9 +21,8 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
-// $app->withFacades();
-
-// $app->withEloquent();
+$app->withFacades();
+$app->withEloquent();
 
 /*
 |--------------------------------------------------------------------------
@@ -76,7 +75,14 @@ $app->singleton(
 |
 */
 
-// $app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
+$app->register(\App\Providers\ConfigServiceProvider::class);
+$app->register(\App\Providers\BotServiceProvider::class);
+
+// Development tools
+if (env('APP_ENV') !== 'production') {
+    $app->register(\Laravel\Tinker\TinkerServiceProvider::class);
+}
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
@@ -93,8 +99,9 @@ $app->singleton(
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
+    'prefix'    => 'bot',
 ], function ($router) {
-    require __DIR__.'/../routes/web.php';
+    require __DIR__.'/../routes/bot.php';
 });
 
 return $app;
