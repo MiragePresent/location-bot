@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use Apix\Log\Logger\File;
 use App\Services\Bot\Bot;
-use App\Services\Bot\Logger;
+use Illuminate\Log\Logger;
 use Illuminate\Support\ServiceProvider;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;

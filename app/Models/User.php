@@ -83,4 +83,15 @@ class User extends Model
 
         return $user;
     }
+
+    /**
+     * Save user location
+     *
+     * @param float $latitude
+     * @param float $longitude
+     */
+    public function saveLocation(float $latitude, float $longitude)
+    {
+        $this->locations()->create(compact('latitude', 'longitude'));
+    }
 }

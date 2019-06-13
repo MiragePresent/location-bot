@@ -2,12 +2,14 @@
 
 namespace App\Services\Bot;
 
+use App\Models\User;
 use App\Services\Bot\Handlers\CallbackQuery\FindByListHandler;
 use App\Services\Bot\Handlers\CallbackQuery\FindByLocationHandler;
-use App\Services\Bot\Handlers\Commands\CommandHandlerInterface;
+use App\Services\Bot\Handlers\CommandHandlerInterface;
 use App\Services\Bot\Handlers\Commands\FindCommand;
 use App\Services\Bot\Handlers\Commands\HelpCommand;
 use App\Services\Bot\Handlers\Commands\StartCommand;
+use App\Services\Bot\Handlers\InlineSearch;
 use App\Services\Bot\Handlers\KeyboardReply\LocationReply;
 use App\Services\Bot\Handlers\KeyboardReply\KeyboardReplyHandlerInterface;
 use App\Services\Bot\Handlers\KeyboardReply\FindInRegionReply;
@@ -33,6 +35,12 @@ use TelegramBot\Api\Types\Update;
 class Bot
 {
     /**
+     * Cache life time for inline mode results
+     *
+     * @var int
+     */
+    public const CACHE_INLINE_MODE_LIFE_TIME = 60 * 60;
+    /**
      * Telegram bot API wrapper
      *
      * @var Client
@@ -54,6 +62,13 @@ class Bot
     protected $api;
 
     protected $chatId;
+
+    /**
+     * User that sends request
+     *
+     * @var User
+     */
+    protected $user;
 
     protected $commands = [
         StartCommand::class,
@@ -87,6 +102,11 @@ class Bot
         return $this->api;
     }
 
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
     /**
      * Returns bot username
      *
@@ -106,16 +126,21 @@ class Bot
         $handler = null;
 
         if ($this->isInlineQuery($update)) {
-            $church = new Venue(623847, 50.7419858, 25.2792952, "Луцьк I", "Владимирская ул., 89б, Луцк, Волынская область, 45624");
+            $this->user = User::findByTelegramId($update->getInlineQuery()->getFrom()->getId());;
 
-            $this->api->answerInlineQuery($update->getInlineQuery()->getId(), [$church]);
+            $handler = new InlineSearch($this);
+            $handler->handle($update);
         } elseif ($this->isCallbackQuery($update)) {
+            $this->user = User::findByTelegramId($update->getCallbackQuery()->getFrom()->getId());;
+
             if ($update->getCallbackQuery()->getData() === FindByListHandler::CALLBACK_DATA) {
                 $handler = new FindByListHandler($this);
             } elseif ($update->getCallbackQuery()->getData() === FindByLocationHandler::CALLBACK_DATA) {
                 $handler = new FindByLocationHandler($this);
             }
         } elseif ($this->isMessage($update)) {
+            $this->user = User::findByTelegramId($update->getMessage()->getFrom()->getId());;
+
             foreach ($this->replyHandlers as $handlerClass) {
                 /** @var KeyboardReplyHandlerInterface $handlerClass */
                 if ($handlerClass::isSuitable($update->getMessage())) {

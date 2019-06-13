@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Model Church
@@ -18,6 +20,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property float     $longitude
  *
  * @property-read City $city
+ * @property-read null|float $distance Distance between user and church (in km)
+ *
+ * @method static Builder nearest(float $latitude, float $longitude)  Finds the nearest churches
  */
 class Church extends Model
 {
@@ -49,5 +54,25 @@ class Church extends Model
     public function city()
     {
         return $this->belongsTo(City::class);
+    }
+
+    public function scopeNearest(
+        Builder $query,
+        float $latitude,
+        float $longitude
+    ): Builder {
+        return $query
+            ->select('*')
+            ->addSelect(DB::raw("(
+                      6371 * acos (
+                      cos ( radians({$latitude}) )
+                      * cos( radians( latitude ) )
+                      * cos( radians( longitude ) - radians({$longitude}) )
+                      + sin ( radians({$latitude}) )
+                      * sin( radians( latitude ) )
+                    )
+                ) AS `distance`
+            "))
+            ->orderBy(DB::raw("((latitude-{$latitude})*(latitude-{$latitude})) + ((longitude - {$longitude})*(longitude - $longitude))"));
     }
 }
