@@ -25,6 +25,7 @@ class CreateCitiesTable extends Migration
                 ->onDelete('cascade');
 
             $table->string('name')->index();
+            $table->string('area', 40);
         });
     }
 
