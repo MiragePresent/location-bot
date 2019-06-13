@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Bot\Handlers\Commands;
+namespace App\Services\Bot\Handlers;
 
 use TelegramBot\Api\Types\Message;
 

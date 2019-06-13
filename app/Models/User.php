@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use TelegramBot\Api\Types\User as TelegramUser;
 
 /**
  * Model User
@@ -46,5 +47,40 @@ class User extends Model
     public function locations()
     {
         return $this->hasMany(UserLocation::class);
+    }
+
+    /**
+     * Finds user by telegram ID
+     *
+     * @param int $telegramId
+     *
+     * @return User|null
+     */
+    public static function findByTelegramId(int $telegramId): ?User
+    {
+        return static::where('telegram_id', $telegramId)->first();
+    }
+
+    /**
+     * Create user from telegram user
+     * @param TelegramUser $tUser
+     *
+     * @return User
+     */
+    public static function createFromTelegramUser(TelegramUser $tUser): User
+    {
+        $user = static::findByTelegramId($tUser->getId());
+
+        if (!$user) {
+            $user = static::create([
+                'telegram_id' => $tUser->getId(),
+                'username' => $tUser->getUsername(),
+                'first_name' => $tUser->getFirstName(),
+                'last_name' => $tUser->getLastName(),
+                'lang' => $tUser->getLanguageCode(),
+            ]);
+        }
+
+        return $user;
     }
 }

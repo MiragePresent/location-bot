@@ -5,12 +5,14 @@ namespace App\Services\Bot;
 use App\Services\Bot\Handlers\CallbackQuery\FindByListHandler;
 use App\Services\Bot\Handlers\CallbackQuery\FindByLocationHandler;
 use App\Services\Bot\Handlers\Commands\CommandHandlerInterface;
-use App\Services\Bot\Handlers\Commands\CommandStartHandler;
-use App\Services\Bot\Handlers\KeyboardReply\LocationHandler;
+use App\Services\Bot\Handlers\Commands\FindCommand;
+use App\Services\Bot\Handlers\Commands\HelpCommand;
+use App\Services\Bot\Handlers\Commands\StartCommand;
+use App\Services\Bot\Handlers\KeyboardReply\LocationReply;
 use App\Services\Bot\Handlers\KeyboardReply\KeyboardReplyHandlerInterface;
-use App\Services\Bot\Handlers\KeyboardReply\FindInRegionHandler;
-use App\Services\Bot\Handlers\KeyboardReply\ShowAddress;
-use App\Services\Bot\Handlers\KeyboardReply\ShowByCity;
+use App\Services\Bot\Handlers\KeyboardReply\FindInRegionReply;
+use App\Services\Bot\Handlers\KeyboardReply\ShowAddressReply;
+use App\Services\Bot\Handlers\KeyboardReply\ShowByCityReply;
 use App\Services\Bot\Handlers\UpdateHandlerInterface;
 use Closure;
 use Illuminate\Log\Logger;
@@ -30,18 +32,6 @@ use TelegramBot\Api\Types\Update;
  */
 class Bot
 {
-    /**
-     * Message type when it's a command
-     *
-     * @var string
-     */
-    public const MESSAGE_ENTITY_TYPE_BOT_COMMAND = 'bot_command';
-
-    public const CALLBACK_NAME_BY_CITY = "inline_callback_by_city";
-    public const CALLBACK_NAME_BY_LOCATION = "inline_callback_by_location";
-
-    public const COMMAND_START = 'start';
-
     /**
      * Telegram bot API wrapper
      *
@@ -66,14 +56,16 @@ class Bot
     protected $chatId;
 
     protected $commands = [
-       CommandStartHandler::class,
+        StartCommand::class,
+        HelpCommand::class,
+        FindCommand::class,
     ];
 
     protected $replyHandlers = [
-        LocationHandler::class,
-        FindInRegionHandler::class,
-        ShowByCity::class,
-        ShowAddress::class,
+        LocationReply::class,
+        FindInRegionReply::class,
+        ShowByCityReply::class,
+        ShowAddressReply::class,
     ];
 
     public function __construct(Client $client, BotApi $api, Logger $logger)
@@ -93,6 +85,18 @@ class Bot
     public function getApi(): BotApi
     {
         return $this->api;
+    }
+
+    /**
+     * Returns bot username
+     *
+     * @return string
+     * @throws Exception
+     * @throws InvalidArgumentException
+     */
+    public function getUsername(): string
+    {
+        return $this->getApi()->getMe()->getUsername();
     }
 
     public function processUpdate(Update $update)
