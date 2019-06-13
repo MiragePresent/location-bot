@@ -33,6 +33,12 @@ class ShowByCity extends AbstractUpdateHandler implements KeyboardReplyHandlerIn
      */
     public function handle(Update $update): void
     {
+        $this->bot->log(sprintf(
+            "Show addresses in city: %s \nFor: %s",
+            $update->getMessage()->getText(),
+            $update->getMessage()->getFrom()->toJson()
+        ));
+
         $kb = new ReplyKeyboardMarkup([[
             "Луцьк І",
             "Ковчег",

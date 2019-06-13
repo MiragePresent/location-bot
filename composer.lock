@@ -4,8 +4,59 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c6df669c5f8b1bb8d20c8a8667e47f0e",
+    "content-hash": "74088f9204c4104bea5a9b587b3baf11",
     "packages": [
+        {
+            "name": "apix/log",
+            "version": "1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/apix/log.git",
+                "reference": "fd9b520fa962d7dfba410c08ea59894819b2fcd3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/apix/log/zipball/fd9b520fa962d7dfba410c08ea59894819b2fcd3",
+                "reference": "fd9b520fa962d7dfba410c08ea59894819b2fcd3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3",
+                "psr/log": "~1.0"
+            },
+            "provide": {
+                "psr/log-implementation": "1.0.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.8.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Apix\\Log\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Franck Cassedanne",
+                    "email": "franck@ouarz.net"
+                }
+            ],
+            "description": "Minimalist, thin and fast PSR-3 compliant (multi-bucket) logger.",
+            "homepage": "https://github.com/frqnck/apix-log",
+            "keywords": [
+                "apix",
+                "log",
+                "logger",
+                "psr",
+                "psr-3"
+            ],
+            "time": "2016-09-22T10:51:22+00:00"
+        },
         {
             "name": "dnoegel/php-xdg-base-dir",
             "version": "0.1",

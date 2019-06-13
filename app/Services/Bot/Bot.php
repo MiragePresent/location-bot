@@ -6,11 +6,12 @@ use App\Services\Bot\Handlers\CallbackQuery\SearchByListUpdateHandler;
 use App\Services\Bot\Handlers\Commands\CommandHandlerInterface;
 use App\Services\Bot\Handlers\Commands\CommandStartHandler;
 use App\Services\Bot\Handlers\KeyboardReply\KeyboardReplyHandlerInterface;
-use App\Services\Bot\Handlers\KeyboardReply\SearchInRegionUpdateHandler;
+use App\Services\Bot\Handlers\KeyboardReply\SearchInRegionHandler;
 use App\Services\Bot\Handlers\KeyboardReply\ShowAddress;
 use App\Services\Bot\Handlers\KeyboardReply\ShowByCity;
 use App\Services\Bot\Handlers\UpdateHandlerInterface;
 use Closure;
+use Illuminate\Log\Logger;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
 use TelegramBot\Api\Exception;
@@ -46,6 +47,13 @@ class Bot
     protected $client;
 
     /**
+     * Logger
+     *
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
      * Bot API
      *
      * @var BotApi
@@ -59,15 +67,16 @@ class Bot
     ];
 
     protected $replyHandlers = [
-        SearchInRegionUpdateHandler::class,
+        SearchInRegionHandler::class,
         ShowByCity::class,
         ShowAddress::class,
     ];
 
-    public function __construct(string $token)
+    public function __construct(Client $client, BotApi $api, Logger $logger)
     {
-        $this->client = new Client($token);
-        $this->api = new BotApi($token);
+        $this->client = $client;
+        $this->api = $api;
+        $this->logger = $logger;
 
         $this->registerCommands();
     }
@@ -84,8 +93,9 @@ class Bot
 
     public function processUpdate(Update $update)
     {
-        $handler = null;
+        $this->log("Processing update: {$update->getUpdateId()}");
 
+        $handler = null;
         if ($this->isCallbackQuery($update)) {
             if ($update->getCallbackQuery()->getData() === SearchByListUpdateHandler::CALLBACK_DATA) {
                 $handler = new SearchByListUpdateHandler($this);
@@ -101,6 +111,8 @@ class Bot
 
         if ($handler instanceof UpdateHandlerInterface) {
             $handler->handle($update);
+        } else {
+            $this->log("Handler not found. \nUpdate: {$update->toJson()}");
         }
     }
 
@@ -124,6 +136,21 @@ class Bot
     public function run()
     {
         $this->getClient()->run();
+    }
+
+    /**
+     * Log bot activity
+     *
+     * @param string      $message
+     * @param null|string $level
+     */
+    public function log(string $message, string $level = null)
+    {
+        if (is_null($level) || !method_exists($this->logger, $level)) {
+            $level = "info";
+        }
+
+        $this->logger->{$level}($message);
     }
 
     /**
