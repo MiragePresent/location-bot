@@ -12,7 +12,7 @@ use TelegramBot\Api\Types\Update;
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  11.06.2019
  */
-class SearchInRegionUpdateHandler extends AbstractUpdateHandler implements KeyboardReplyHandlerInterface
+class SearchInRegionHandler extends AbstractUpdateHandler implements KeyboardReplyHandlerInterface
 {
     /**
      * @inheritDoc
@@ -35,6 +35,12 @@ class SearchInRegionUpdateHandler extends AbstractUpdateHandler implements Keybo
      */
     public function handle(Update $update): void
     {
+        $this->bot->log(sprintf(
+            "Search in region: %s \nFor: %s",
+            $update->getMessage()->getText(),
+            $update->getMessage()->getFrom()->toJson()
+        ));
+
         $kb = new ReplyKeyboardMarkup([[
             "Вінниця",
             "Луцьк",

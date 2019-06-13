@@ -27,6 +27,12 @@ class ShowAddress extends AbstractUpdateHandler implements KeyboardReplyHandlerI
      */
     public function handle(Update $update): void
     {
+        $this->bot->log(sprintf(
+            "Show address: %s \nFor: %s",
+            $update->getMessage()->getText(),
+            $update->getMessage()->getFrom()->toJson()
+        ));
+
         $addr = "вул. Володимирська 89б";
 
         $kb = new InlineKeyboardMarkup([[

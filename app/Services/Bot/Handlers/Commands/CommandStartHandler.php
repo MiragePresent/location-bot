@@ -57,6 +57,11 @@ class CommandStartHandler implements CommandHandlerInterface
      */
     public function handle(Message $message): void
     {
+        $this->bot->log(sprintf(
+            "Running start command by: %s",
+            $message->getFrom()->toJson()
+        ));
+
         $byLocation = [
             "text" => "Знайти поблизу",
             "callback_data" => Bot::CALLBACK_NAME_BY_LOCATION,
