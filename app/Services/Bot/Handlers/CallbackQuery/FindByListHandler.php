@@ -34,6 +34,12 @@ class FindByListHandler extends AbstractUpdateHandler implements CallbackQueryHa
      */
     public function handle(Update $update): void
     {
+        $this->bot->log(sprintf(
+           "CallbackQuery: %s \nFrom: %s",
+           $update->getCallbackQuery()->getData(),
+           $update->getCallbackQuery()->getFrom()->toJson()
+        ));
+
         $kb = new ReplyKeyboardMarkup(
             [[
                 ["text" => "Вінницька обл."],
