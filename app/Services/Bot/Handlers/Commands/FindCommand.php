@@ -3,8 +3,8 @@
 namespace App\Services\Bot\Handlers\Commands;
 
 use App\Services\Bot\Handlers\AbstractCommandHandler;
-use App\Services\Bot\Handlers\CallbackQuery\FindByListHandler;
-use App\Services\Bot\Handlers\CallbackQuery\FindByLocationHandler;
+use App\Services\Bot\Handlers\CallbackQuery\FindByList;
+use App\Services\Bot\Handlers\CallbackQuery\FindByLocation;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 use TelegramBot\Api\Types\Message;
 
@@ -46,11 +46,11 @@ class FindCommand extends AbstractCommandHandler
 
         $byList = [
             "text" => "Вибрати із списку",
-            "callback_data" => FindByListHandler::CALLBACK_DATA,
+            "callback_data" => FindByList::CALLBACK_DATA,
         ];
         $byLocation = [
             "text" => "Знайти поблизу",
-            "callback_data" => FindByLocationHandler::CALLBACK_DATA,
+            "callback_data" => FindByLocation::CALLBACK_DATA,
         ];
 
         $keyboard = new InlineKeyboardMarkup([[ $byList, $byLocation ]]);

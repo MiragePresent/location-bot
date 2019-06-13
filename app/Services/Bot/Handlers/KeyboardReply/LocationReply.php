@@ -8,7 +8,7 @@ use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 
 /**
- * Class FindByLocationHandler
+ * Class FindByLocation
  *
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  12.06.2019

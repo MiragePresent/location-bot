@@ -3,8 +3,8 @@
 namespace App\Services\Bot;
 
 use App\Models\User;
-use App\Services\Bot\Handlers\CallbackQuery\FindByListHandler;
-use App\Services\Bot\Handlers\CallbackQuery\FindByLocationHandler;
+use App\Services\Bot\Handlers\CallbackQuery\FindByList;
+use App\Services\Bot\Handlers\CallbackQuery\FindByLocation;
 use App\Services\Bot\Handlers\CommandHandlerInterface;
 use App\Services\Bot\Handlers\Commands\FindCommand;
 use App\Services\Bot\Handlers\Commands\HelpCommand;
@@ -22,7 +22,6 @@ use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
-use TelegramBot\Api\Types\Inline\QueryResult\Venue;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 
@@ -133,10 +132,10 @@ class Bot
         } elseif ($this->isCallbackQuery($update)) {
             $this->user = User::findByTelegramId($update->getCallbackQuery()->getFrom()->getId());;
 
-            if ($update->getCallbackQuery()->getData() === FindByListHandler::CALLBACK_DATA) {
-                $handler = new FindByListHandler($this);
-            } elseif ($update->getCallbackQuery()->getData() === FindByLocationHandler::CALLBACK_DATA) {
-                $handler = new FindByLocationHandler($this);
+            if ($update->getCallbackQuery()->getData() === FindByList::CALLBACK_DATA) {
+                $handler = new FindByList($this);
+            } elseif ($update->getCallbackQuery()->getData() === FindByLocation::CALLBACK_DATA) {
+                $handler = new FindByLocation($this);
             }
         } elseif ($this->isMessage($update)) {
             $this->user = User::findByTelegramId($update->getMessage()->getFrom()->getId());;
@@ -145,6 +144,8 @@ class Bot
                 /** @var KeyboardReplyHandlerInterface $handlerClass */
                 if ($handlerClass::isSuitable($update->getMessage())) {
                     $handler = new $handlerClass($this);
+
+                    break;
                 }
             }
         }

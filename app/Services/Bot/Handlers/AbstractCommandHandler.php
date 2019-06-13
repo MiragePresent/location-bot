@@ -4,7 +4,6 @@ namespace App\Services\Bot\Handlers;
 
 use App\Services\Bot\Bot;
 use TelegramBot\Api\Types\Message;
-use TelegramBot\Api\Types\Update;
 
 /**
  * Class AbstractCommandHandler

@@ -2,17 +2,20 @@
 
 namespace App\Services\Bot\Handlers\CallbackQuery;
 
+use App\Models\Region;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use TelegramBot\Api\Types\ReplyKeyboardMarkup;
 use TelegramBot\Api\Types\Update;
 
 /**
- * Class FindByListHandler
+ * Class FindByList
  *
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  10.06.2019
  */
-class FindByListHandler extends AbstractUpdateHandler implements CallbackQueryHandlerInterface
+class FindByList extends AbstractUpdateHandler implements CallbackQueryHandlerInterface
 {
     /**
      * Callback identity name
@@ -40,14 +43,15 @@ class FindByListHandler extends AbstractUpdateHandler implements CallbackQueryHa
            $update->getCallbackQuery()->getFrom()->toJson()
         ));
 
+        /** @var Region[]|Collection $regions */
+        $regions = Cache::remember('regions', Region::CACHE_LIFE_TIME, function () {
+            return Region::orderBy('name')->get();
+        });
+
         $kb = new ReplyKeyboardMarkup(
-            [[
-                ["text" => "Вінницька обл."],
-                ["text" => "Волинська обл."],
-                ["text" => "Дніпропетровська обл."],
-                ["text" => "Донецька обл."],
-                ["text" => "Житомирська обл."],
-            ]],
+            $regions->map(function (Region $region) {
+                return [["text" => $region->name ]];
+            })->toArray(),
             true,
             true
         );

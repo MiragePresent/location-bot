@@ -27,6 +27,13 @@ use Illuminate\Support\Facades\DB;
 class Church extends Model
 {
     /**
+     * Cache life time in seconds (a week)
+     *
+     * @var int
+     */
+    public const CACHE_LIFE_TIME = 7 * 24 * 60 * 60;
+
+    /**
      * {@inheritDoc}
      */
     public $timestamps = false;
