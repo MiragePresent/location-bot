@@ -125,12 +125,12 @@ class Bot
         $handler = null;
 
         if ($this->isInlineQuery($update)) {
-            $this->user = User::findByTelegramId($update->getInlineQuery()->getFrom()->getId());;
+            $this->user = User::findByTelegramId($update->getInlineQuery()->getFrom()->getId());
 
             $handler = new InlineSearch($this);
             $handler->handle($update);
         } elseif ($this->isCallbackQuery($update)) {
-            $this->user = User::findByTelegramId($update->getCallbackQuery()->getFrom()->getId());;
+            $this->user = User::findByTelegramId($update->getCallbackQuery()->getFrom()->getId());
 
             if ($update->getCallbackQuery()->getData() === FindByList::CALLBACK_DATA) {
                 $handler = new FindByList($this);
@@ -138,7 +138,7 @@ class Bot
                 $handler = new FindByLocation($this);
             }
         } elseif ($this->isMessage($update)) {
-            $this->user = User::findByTelegramId($update->getMessage()->getFrom()->getId());;
+            $this->user = User::findByTelegramId($update->getMessage()->getFrom()->getId());
 
             foreach ($this->replyHandlers as $handlerClass) {
                 /** @var KeyboardReplyHandlerInterface $handlerClass */

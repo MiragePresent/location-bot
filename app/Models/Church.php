@@ -80,6 +80,11 @@ class Church extends Model
                     )
                 ) AS `distance`
             "))
-            ->orderBy(DB::raw("((latitude-{$latitude})*(latitude-{$latitude})) + ((longitude - {$longitude})*(longitude - $longitude))"));
+            ->orderBy(
+                DB::raw(
+                    "((latitude-{$latitude}) * (latitude-{$latitude}))" .
+                    "+ ((longitude - {$longitude})*(longitude - $longitude))"
+                )
+            );
     }
 }

@@ -37,7 +37,7 @@ class LocationReply extends AbstractUpdateHandler implements KeyboardReplyHandle
         Church::nearest($location->getLatitude(), $location->getLongitude())
             ->take(3)
             ->get()
-            ->each(function (Church $church) use ($update){
+            ->each(function (Church $church) use ($update) {
                 $this->bot->getApi()->sendVenue(
                     $update->getMessage()->getChat()->getId(),
                     $church->latitude,

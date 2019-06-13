@@ -37,21 +37,29 @@ class FindByList extends AbstractUpdateHandler implements CallbackQueryHandlerIn
      */
     public function handle(Update $update): void
     {
-        $this->bot->log(sprintf(
-           "CallbackQuery: %s \nFrom: %s",
-           $update->getCallbackQuery()->getData(),
-           $update->getCallbackQuery()->getFrom()->toJson()
-        ));
+        $this->bot->log(
+            sprintf(
+                "CallbackQuery: %s \nFrom: %s",
+                $update->getCallbackQuery()->getData(),
+                $update->getCallbackQuery()->getFrom()->toJson()
+            )
+        );
 
         /** @var Region[]|Collection $regions */
-        $regions = Cache::remember('regions', Region::CACHE_LIFE_TIME, function () {
-            return Region::orderBy('name')->get();
-        });
+        $regions = Cache::remember(
+            'regions',
+            Region::CACHE_LIFE_TIME,
+            function () {
+                return Region::orderBy('name')->get();
+            }
+        );
 
         $kb = new ReplyKeyboardMarkup(
-            $regions->map(function (Region $region) {
-                return [["text" => $region->name ]];
-            })->toArray(),
+            $regions->map(
+                function (Region $region) {
+                    return [["text" => $region->name ]];
+                }
+            )->toArray(),
             true,
             true
         );
