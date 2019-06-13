@@ -3,6 +3,7 @@
 namespace App\Services\Bot\Handlers\KeyboardReply;
 
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
+use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\ReplyKeyboardMarkup;
 use TelegramBot\Api\Types\Update;
 
@@ -12,12 +13,12 @@ use TelegramBot\Api\Types\Update;
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  11.06.2019
  */
-class SearchInRegionHandler extends AbstractUpdateHandler implements KeyboardReplyHandlerInterface
+class FindInRegionHandler extends AbstractUpdateHandler implements KeyboardReplyHandlerInterface
 {
     /**
      * @inheritDoc
      */
-    public static function isSuitable(string $reply): bool
+    public static function isSuitable(Message $message): bool
     {
         $regions = [
             "Вінницька обл.",
@@ -27,7 +28,7 @@ class SearchInRegionHandler extends AbstractUpdateHandler implements KeyboardRep
             "Житомирська обл."
         ];
 
-        return in_array($reply, $regions);
+        return in_array($message->getText(), $regions);
     }
 
     /**
@@ -35,20 +36,14 @@ class SearchInRegionHandler extends AbstractUpdateHandler implements KeyboardRep
      */
     public function handle(Update $update): void
     {
-        $this->bot->log(sprintf(
-            "Search in region: %s \nFor: %s",
-            $update->getMessage()->getText(),
-            $update->getMessage()->getFrom()->toJson()
-        ));
-
         $kb = new ReplyKeyboardMarkup([[
             "Вінниця",
             "Луцьк",
             "Дніпро",
             "Донецьк",
             "Житомир",
-        ]], true);
+        ]], true, true);
 
-        $this->bot->reply($update->getMessage(), "Вкажіть, будь ласка, місто:", $kb);
+        $this->bot->reply($update->getMessage(), "Вкажи, будь ласка, місто", $kb);
     }
 }

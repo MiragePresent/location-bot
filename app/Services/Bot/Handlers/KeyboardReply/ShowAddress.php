@@ -4,6 +4,7 @@ namespace App\Services\Bot\Handlers\KeyboardReply;
 
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
+use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 
 /**
@@ -17,9 +18,9 @@ class ShowAddress extends AbstractUpdateHandler implements KeyboardReplyHandlerI
     /**
      * @inheritDoc
      */
-    public static function isSuitable(string $reply): bool
+    public static function isSuitable(Message $message): bool
     {
-        return $reply === "Луцьк І";
+        return $message->getText() === "Луцьк І";
     }
 
     /**
