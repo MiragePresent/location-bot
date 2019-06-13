@@ -38,11 +38,8 @@ class HelpCommand extends AbstractCommandHandler
             $message->getFrom()->toJson()
         ));
 
-        // 😉
-        $winking_face = emoji("\xF0\x9F\x98\x89");
-
-        // ▪
-        $list_dot = emoji("\xE2\x96\xAA");
+        $winking_face = emoji("\xF0\x9F\x98\x89"); // 😉
+        $list_dot = emoji("\xE2\x96\xAA"); // ▪
 
         $text = "Ось мої основні можливості:\n" .
 
