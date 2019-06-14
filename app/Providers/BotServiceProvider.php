@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Apix\Log\Logger\File;
 use App\Services\Bot\Bot;
+use App\Services\Bot\StorageClient;
+use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Log\Logger;
 use Illuminate\Support\ServiceProvider;
 use TelegramBot\Api\BotApi;
@@ -29,8 +31,12 @@ class BotServiceProvider extends ServiceProvider
                 ->setDeferred(true);
 
             $logger = new Logger($fileLogger);
+            $storage = new StorageClient(
+                config('bot.storage_api'),
+                new GuzzleClient()
+            );
 
-            return new Bot($client, $api, $logger);
+            return new Bot($client, $api, $storage, $logger);
         });
     }
 }

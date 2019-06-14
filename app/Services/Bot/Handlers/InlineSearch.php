@@ -4,7 +4,9 @@ namespace App\Services\Bot\Handlers;
 
 use App\Models\Church;
 use App\Services\Bot\Bot;
+use App\Services\Bot\DataType\ObjectData;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use TelegramBot\Api\Types\Inline\QueryResult\Venue;
 use TelegramBot\Api\Types\Update;
 
@@ -21,7 +23,7 @@ class InlineSearch extends AbstractUpdateHandler
         $this->bot->log(sprintf(
             "Inline query request: %s\nFor: %s",
             $update->getInlineQuery()->getQuery(),
-            $update->getInlineQuery()->getFrom()
+            $update->getInlineQuery()->getFrom()->toJson()
         ));
 
         $this->bot->getApi()->answerInlineQuery(
@@ -33,24 +35,35 @@ class InlineSearch extends AbstractUpdateHandler
 
     private function getResults(string $query, int $offset): array
     {
-        /** @var Collection $churches */
-        $churches = Church::where('name', 'like', $query . '%')
-            ->take(50)
-            ->offset($offset)
-            ->orderBy('name')
-            ->get();
+        /** @var Collection|Church[] $churches */
+        $churches = Cache::remember(
+            "search_like_{$query}_{$offset}",
+            Church::CACHE_LIFE_TIME,
+            function () use ($query, $offset) {
+                return Church::where('name', 'like', $query . '%')
+                    ->take(50)
+                    ->offset($offset)
+                    ->orderBy('name')
+                    ->get();
+            }
+        );
 
         if (!$churches->count()) {
             return [];
         }
 
         return $churches->map(function (Church $church) {
+
+            /** @var ObjectData $object */
+            $object = $this->bot->getStorage()->getObject($church->object_id);
+
             return new Venue(
                 $church->id,
                 (float) $church->latitude,
                 (float) $church->longitude,
                 $church->name,
-                $church->address
+                $church->address,
+                $object->photo->url ?? null
             );
         })->toArray();
     }

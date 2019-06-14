@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
  *
  * @property int       $id
  * @property int       $city_id
+ * @property int       $object_id
  * @property string    $name
  * @property string    $address
  * @property float     $latitude
@@ -45,6 +46,7 @@ class Church extends Model
      */
     protected $fillable = [
         'city_id',
+        'object_id',
         'name',
         'address',
         'latitude',

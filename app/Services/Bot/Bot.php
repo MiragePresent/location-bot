@@ -47,20 +47,25 @@ class Bot
     protected $client;
 
     /**
-     * Logger
-     *
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
      * Bot API
      *
      * @var BotApi
      */
     protected $api;
 
-    protected $chatId;
+    /**
+     * SDA API client
+     *
+     * @var StorageClient
+     */
+    protected $storage;
+
+    /**
+     * Logger
+     *
+     * @var Logger
+     */
+    protected $logger;
 
     /**
      * User that sends request
@@ -82,11 +87,12 @@ class Bot
         ShowAddressReply::class,
     ];
 
-    public function __construct(Client $client, BotApi $api, Logger $logger)
+    public function __construct(Client $client, BotApi $api, StorageClient $storage, Logger $logger)
     {
         $this->client = $client;
         $this->api = $api;
         $this->logger = $logger;
+        $this->storage = $storage;
 
         $this->registerCommands();
     }
@@ -99,6 +105,11 @@ class Bot
     public function getApi(): BotApi
     {
         return $this->api;
+    }
+
+    public function getStorage(): StorageClient
+    {
+        return $this->storage;
     }
 
     public function getUser(): User
