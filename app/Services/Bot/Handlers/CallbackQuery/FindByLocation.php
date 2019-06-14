@@ -7,12 +7,12 @@ use TelegramBot\Api\Types\ReplyKeyboardMarkup;
 use TelegramBot\Api\Types\Update;
 
 /**
- * Class FindByLocationHandler
+ * Class FindByLocation
  *
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  12.06.2019
  */
-class FindByLocationHandler extends AbstractUpdateHandler implements CallbackQueryHandlerInterface
+class FindByLocation extends AbstractUpdateHandler implements CallbackQueryHandlerInterface
 {
     /**
      * Callback identity name
@@ -36,7 +36,7 @@ class FindByLocationHandler extends AbstractUpdateHandler implements CallbackQue
     {
         $kb = new ReplyKeyboardMarkup([[
             ["text" => "Я зараз тут", "request_location" => true]
-        ]], true);
+        ]], true, true);
 
         $this->bot->reply($update->getCallbackQuery()->getMessage(), "Де ти зараз знаходишся?", $kb);
     }
