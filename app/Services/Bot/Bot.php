@@ -10,6 +10,7 @@ use App\Services\Bot\Handlers\Commands\FindCommand;
 use App\Services\Bot\Handlers\Commands\HelpCommand;
 use App\Services\Bot\Handlers\Commands\StartCommand;
 use App\Services\Bot\Handlers\InlineSearch;
+use App\Services\Bot\Handlers\KeyboardReply\IncorrectMessage;
 use App\Services\Bot\Handlers\KeyboardReply\LocationReply;
 use App\Services\Bot\Handlers\KeyboardReply\KeyboardReplyHandlerInterface;
 use App\Services\Bot\Handlers\KeyboardReply\FindInRegionReply;
@@ -74,12 +75,22 @@ class Bot
      */
     protected $user;
 
+    /**
+     * Bot commands handlers
+     *
+     * @var array
+     */
     protected $commands = [
         StartCommand::class,
         HelpCommand::class,
         FindCommand::class,
     ];
 
+    /**
+     * Bot messages handlers
+     *
+     * @var array
+     */
     protected $replyHandlers = [
         LocationReply::class,
         FindInRegionReply::class,
@@ -87,6 +98,14 @@ class Bot
         ShowAddressReply::class,
     ];
 
+    /**
+     * Bot service constructor.
+     *
+     * @param Client        $client
+     * @param BotApi        $api
+     * @param StorageClient $storage
+     * @param Logger        $logger
+     */
     public function __construct(Client $client, BotApi $api, StorageClient $storage, Logger $logger)
     {
         $this->client = $client;
@@ -97,21 +116,41 @@ class Bot
         $this->registerCommands();
     }
 
+    /**
+     * Returns telegram bot client
+     *
+     * @return Client
+     */
     public function getClient(): Client
     {
         return $this->client;
     }
 
+    /**
+     * Returns telegram bot api
+     *
+     * @return BotApi
+     */
     public function getApi(): BotApi
     {
         return $this->api;
     }
 
+    /**
+     * Returns SDA api with stored churches data
+     *
+     * @return StorageClient
+     */
     public function getStorage(): StorageClient
     {
         return $this->storage;
     }
 
+    /**
+     * User that sent request
+     *
+     * @return User
+     */
     public function getUser(): User
     {
         return $this->user;
@@ -129,6 +168,11 @@ class Bot
         return $this->getApi()->getMe()->getUsername();
     }
 
+    /**
+     * This method handles all updates (except commands)
+     *
+     * @param Update $update
+     */
     public function processUpdate(Update $update)
     {
         $this->log("Processing update: {$update->getUpdateId()}");
@@ -161,14 +205,17 @@ class Bot
             }
         }
 
-        if ($handler instanceof UpdateHandlerInterface) {
-            $handler->handle($update);
-        } else {
+        if (! ($handler instanceof UpdateHandlerInterface)) {
             $this->log("Handler not found. \nUpdate: {$update->toJson()}");
+            $handler = new IncorrectMessage($this);
         }
+
+        $handler->handle($update);
     }
 
     /**
+     * Send reply to chat
+     *
      * @param int|string|Message $to
      * @param      $text
      * @param null $kb
@@ -185,6 +232,11 @@ class Bot
         }
     }
 
+    /**
+     * Run web hooks listening
+     *
+     * @throws \TelegramBot\Api\InvalidJsonException
+     */
     public function run()
     {
         $this->getClient()->run();
