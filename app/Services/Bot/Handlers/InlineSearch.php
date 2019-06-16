@@ -59,8 +59,8 @@ class InlineSearch extends AbstractUpdateHandler
 
             return new Venue(
                 $church->id,
-                (float) $church->latitude,
-                (float) $church->longitude,
+                (float) $object->locality->coordinates->latitude,
+                (float) $object->locality->coordinates->longitude,
                 $church->name,
                 $church->address,
                 $object->photo->url ?? null

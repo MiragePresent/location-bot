@@ -5,11 +5,18 @@ namespace App\Services\Bot\DataType;
 /**
  * Class CoordinatesData
  *
+ * location_bob_9087
+ *
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  14.06.2019
  */
 class CoordinatesData extends AbstractDataType
 {
+    protected $aliases = [
+        'lat' => 'latitude',
+        'lng' => 'longitude',
+    ];
+
     /**
      * Latitude
      *

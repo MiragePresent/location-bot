@@ -38,10 +38,13 @@ class LocationReply extends AbstractUpdateHandler implements KeyboardReplyHandle
             ->take(3)
             ->get()
             ->each(function (Church $church) use ($update) {
+
+                $object = $this->bot->getStorage()->getObject($church->object_id);
+
                 $this->bot->getApi()->sendVenue(
                     $update->getMessage()->getChat()->getId(),
-                    $church->latitude,
-                    $church->longitude,
+                    (float) $object->locality->coordinates->latitude,
+                    (float) $object->locality->coordinates->longitude,
                     $church->name . sprintf(" (%01.2f км.)", $church->distance),
                     $church->address
                 );

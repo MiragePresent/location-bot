@@ -53,10 +53,12 @@ class ShowAddressReply extends AbstractUpdateHandler implements KeyboardReplyHan
             }
         );
 
+        $object = $this->bot->getStorage()->getObject($church->object_id);
+
         $this->bot->getApi()->sendVenue(
             $update->getMessage()->getChat()->getId(),
-            $church->latitude,
-            $church->longitude,
+            (float) $object->locality->coordinates->latitude,
+            (float) $object->locality->coordinates->longitude,
             $church->name,
             $church->address
         );
