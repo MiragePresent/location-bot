@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  # PHP application container
+  lumen:
+    container_name: lumen
+    build: .container/docker
+    image: php:own
+    depends_on:
+      - mysql
+    volumes:
+      - ./:/app:cached
+
+  # Database container
+  mysql:
+    container_name: mysql
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    env_file:
+      - .env
+    volumes:
+      - db-data:/var/lib/mysql:cached
+
+  # Web Server
+  nginx:
+    container_name: nginx
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - .container/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:cached
+      - ./:/app:cached
+    depends_on:
+      - lumen
+
+volumes:
+  db-data:
