@@ -10,6 +10,8 @@ services:
       - mysql
     volumes:
       - ./:/app:cached
+    networks:
+      - app_network
 
   # Database container
   mysql:
@@ -21,6 +23,8 @@ services:
       - .env
     volumes:
       - db-data:/var/lib/mysql:cached
+    networks:
+      - app_network
 
   # Web Server
   nginx:
@@ -33,6 +37,12 @@ services:
       - ./:/app:cached
     depends_on:
       - lumen
+    networks:
+      - app_network
 
 volumes:
   db-data:
+
+networks:
+  app_network:
+    driver: "bridge"
