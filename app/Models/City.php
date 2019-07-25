@@ -39,6 +39,7 @@ class City extends Model
     protected $fillable = [
         'region_id',
         'name',
+        'area',
     ];
 
     // RELATIONS
