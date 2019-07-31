@@ -45,6 +45,35 @@ class StorageClient
     }
 
     /**
+     * Load objects from API
+     *
+     * @param int $offset
+     * @param int $limit
+     *
+     * @return array
+     * @throws GuzzleException
+     */
+    public function getObjects(int $offset, int $limit): array
+    {
+        $result = [];
+        $response = $this->http->request("GET", "{$this->url}/objects?offset={$offset}&limit={$limit}");
+
+        if ($response->getStatusCode() === 200) {
+            $json = $response->getBody()->getContents();
+            $data = json_decode($json, true);
+
+            foreach ($data['mapObjects'] as $data) {
+                $object = new ObjectData();
+                $object->loadFrom($data);
+
+                $result[] = $object;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Returns API object data
      *
      * @param int $objectId

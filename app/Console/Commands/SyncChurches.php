@@ -44,15 +44,24 @@ class SyncChurches extends Command
             $list = $bot->getStorage()->getObjects($offset, $limit);
 
             foreach ($list as $objectData) {
+                /** @var ObjectData $objectData */
                 $progress->advance();
 
-                if ($objectData->type !== ObjectData::TYPE_CHURCH || empty($objectData->locality)) {
-                    $this->info("Locality is empty or object is not church");
+                if ($objectData->type !== ObjectData::TYPE_CHURCH) {
+                    $this->info("Object is not church");
+
+                    continue;
+                }
+
+                if (empty($objectData->locality)) {
+                    $this->info('Object locality is empty');
+
                     continue;
                 }
 
                 if (!$city = $this->findCity($objectData)) {
                     $this->info("City {$objectData->getName()} not found");
+
                     continue;
                 }
 
@@ -73,7 +82,7 @@ class SyncChurches extends Command
                 }
             }
 
-            $offset += count($list) - 1;
+            $offset += count($list);
         } while (count($list));
 
         $progress->finish();
@@ -98,8 +107,6 @@ class SyncChurches extends Command
         // cut word 'область'
         if (strpos($region_name, ' ')) {
             $region_name = substr($region_name, 0, strpos($region_name, ' '));
-
-            $region_name .= ' обл.';
         }
 
         if (!$region || $region->name !== $region_name) {
