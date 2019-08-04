@@ -179,7 +179,10 @@ class Bot
 
         $handler = null;
 
-        if ($this->isInlineQuery($update)) {
+        if ($this->isCommand($update)) {
+
+            return;
+        } elseif ($this->isInlineQuery($update)) {
             $this->user = User::findByTelegramId($update->getInlineQuery()->getFrom()->getId());
 
             $handler = new InlineSearch($this);
@@ -275,13 +278,36 @@ class Bot
     }
 
     /**
+     * Determines whether message is command
+     *
+     * @param Update $update
+     *
+     * @return bool
+     */
+    private function isCommand(Update $update): bool
+    {
+        if (!empty($update->getMessage())) {
+            foreach ($this->commands as $commandClass) {
+                /** @var CommandHandlerInterface $command */
+                $command = new $commandClass($this);
+
+                if ('/' . $command->getSignature() === $update->getMessage()->getText()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Determines whether update is inline query
      *
      * @param Update $update
      *
      * @return bool
      */
-    public function isInlineQuery(Update $update): bool
+    private function isInlineQuery(Update $update): bool
     {
         return !empty($update->getInlineQuery());
     }
