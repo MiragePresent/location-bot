@@ -7,7 +7,7 @@ use App\Services\Bot\Bot;
 use App\Services\Bot\DataType\ObjectData;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
-use TelegramBot\Api\Types\Inline\QueryResult\Venue;
+use TelegramBot\Api\Types\Inline\QueryResult\Article;
 use TelegramBot\Api\Types\Update;
 
 /**
@@ -53,17 +53,14 @@ class InlineSearch extends AbstractUpdateHandler
         }
 
         return $churches->map(function (Church $church) {
-
             /** @var ObjectData $object */
             $object = $this->bot->getStorage()->getObject($church->object_id);
 
-            return new Venue(
-                $church->id,
-                (float) $object->locality->coordinates->latitude,
-                (float) $object->locality->coordinates->longitude,
-                $church->name,
-                $church->address,
-                $object->photo->url ?? null
+            return new Article(
+                $object->id,
+                $object->getName(),
+                $object->getAddress(),
+                $object->photo
             );
         })->toArray();
     }

@@ -30,7 +30,7 @@ class ShowByCityReply extends AbstractUpdateHandler implements KeyboardReplyHand
             City::CACHE_LIFE_TIME,
             function () use ($message) {
                 return City::has('churches')
-                ->where('name', $message->getText())
+                    ->where('name', $message->getText())
                     ->first();
             }
         );
@@ -56,6 +56,7 @@ class ShowByCityReply extends AbstractUpdateHandler implements KeyboardReplyHand
             function () use ($update) {
                 return City::has('churches')
                     ->where('name', $update->getMessage()->getText())
+                    ->orderBy('name')
                     ->first();
             }
         );
