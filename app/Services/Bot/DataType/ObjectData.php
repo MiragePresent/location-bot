@@ -2,6 +2,8 @@
 
 namespace App\Services\Bot\DataType;
 
+use App\Http\MapsTrait;
+
 /**
  * Class ObjectData
  *
@@ -12,6 +14,8 @@ namespace App\Services\Bot\DataType;
  */
 class ObjectData extends AbstractDataType
 {
+    use MapsTrait;
+
     /**
      * Cache file time
      *

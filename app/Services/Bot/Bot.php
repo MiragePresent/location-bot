@@ -229,9 +229,9 @@ class Bot
     public function reply($to, $text, $kb = null)
     {
         if ($to instanceof Message) {
-            $this->getApi()->sendMessage($to->getChat()->getId(), $text, null, false, null, $kb);
+            $this->getApi()->sendMessage($to->getChat()->getId(), $text, 'markdown', false, null, $kb);
         } else {
-            $this->getApi()->sendMessage($to, $text, null, false, null, $kb);
+            $this->getApi()->sendMessage($to, $text, 'markdown', false, null, $kb);
         }
     }
 
