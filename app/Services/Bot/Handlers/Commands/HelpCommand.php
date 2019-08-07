@@ -38,21 +38,21 @@ class HelpCommand extends AbstractCommandHandler
             $message->getFrom()->toJson()
         ));
 
-        $winking_face = emoji("\xF0\x9F\x98\x89"); // 😉
-        $list_dot = emoji("\xE2\x96\xAA"); // ▪
+        $winking_face = emoji('\xF0\x9F\x98\x89'); // 😉
+        $listDot = emoji('\xF0\x9F\x94\xB8'); // 🔸
 
         $text = "Ось мої основні можливості:\n" .
 
             // /find command description
-            "{$list_dot} Для пошуку викликай команду /" . FindCommand::COMMAND_SIGNATURE .
+            "{$listDot} Для пошуку викликай команду /" . FindCommand::COMMAND_SIGNATURE .
             " і просто слідуй інструкціям.\n" .
 
             // Inline mode description
-            "{$list_dot} Також ти можеш скористатись пошуком звернувшись до мене @" . $this->bot->getUsername() .
+            "{$listDot} Також ти можеш скористатись пошуком звернувшись до мене @" . $this->bot->getUsername() .
             " та вказавши населений пункт. \n" .
 
             // /help command description
-            "{$list_dot} для отримання довідки використовуй команду /" . static::COMMAND_SIGNATURE . "\n".
+            "{$listDot} для отримання довідки використовуй команду /" . static::COMMAND_SIGNATURE . "\n".
             "\n" .
             "Надіюсь стану тобі в нагоді {$winking_face}";
 
