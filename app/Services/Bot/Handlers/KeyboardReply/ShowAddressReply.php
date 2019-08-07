@@ -3,10 +3,9 @@
 namespace App\Services\Bot\Handlers\KeyboardReply;
 
 use App\Models\Church;
-use App\Services\Bot\DataType\ObjectData;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
+use App\Services\Bot\Message\AddressMessage;
 use Illuminate\Support\Facades\Cache;
-use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 
@@ -56,30 +55,12 @@ class ShowAddressReply extends AbstractUpdateHandler implements KeyboardReplyHan
         );
 
         $object = $this->bot->getStorage()->getObject($church->object_id);
-
-        $buttons[] = [ 'text' => "Відкрити на карті", 'url' => $object->getMarkerUrl() ];
-
-        if ($object->facebook) {
-            $buttons[] = ['text' => 'Facebook', 'url' => $object->facebook];
-        }
+        $message = new AddressMessage($object);
 
         $this->bot->reply(
             $update->getMessage()->getChat()->getId(),
-            $this->getChurchInfo($object),
-            new InlineKeyboardMarkup([$buttons])
+            $message->getText(),
+            $message->getMarkup()
         );
-    }
-
-    /**
-     * @param ObjectData $object
-     *
-     * @return string
-     */
-    private function getChurchInfo(ObjectData $object): string
-    {
-        // ⛪
-        $church = emoji("\xE2\x9B\xAA");
-
-        return "*{$object->getName()}* {$church}\n{$object->getAddress()}";
     }
 }
