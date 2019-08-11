@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Bot\Message;
+namespace App\Services\Bot\Answer;
 
 use App\Services\Bot\Handlers\CallbackQuery\FindByList;
 use App\Services\Bot\Handlers\CallbackQuery\FindByLocation;
@@ -12,7 +12,7 @@ use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  11.08.2019
  */
-class FindMessage implements MessageInterface
+class FindCommandAnswer implements AnswerInterface
 {
     /**
      * @inheritDoc

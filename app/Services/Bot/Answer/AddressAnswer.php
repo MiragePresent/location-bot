@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Bot\Message;
+namespace App\Services\Bot\Answer;
 
 use App\Services\Bot\DataType\ObjectData;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
@@ -11,7 +11,7 @@ use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  07.08.2019
  */
-class AddressMessage implements MessageInterface
+class AddressAnswer implements AnswerInterface
 {
     /**
      * Object data
@@ -20,9 +20,17 @@ class AddressMessage implements MessageInterface
      */
     protected $object;
 
-    public function __construct(ObjectData $objectData)
+    /**
+     * Distance to the church
+     *
+     * @var float|null
+     */
+    protected $distance = null;
+
+    public function __construct(ObjectData $objectData, float $distance = null)
     {
         $this->object = $objectData;
+        $this->distance = $distance;
     }
 
     /**
@@ -30,8 +38,14 @@ class AddressMessage implements MessageInterface
      */
     public function getText(): string
     {
+        $name = $this->object->getName();
+
+        if (!is_null($this->distance) && round($this->distance, 2) > 0 ) {
+            $name .= sprintf(" (%01.2f км.)", $this->distance);
+        }
+
         return trans("bot.messages.text.church_address", [
-            'name' => $this->object->getName(),
+            'name' => $name,
             'address' => $this->object->getAddress(),
         ]);
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Bot\Message;
+namespace App\Services\Bot\Answer;
 
 /**
  * Class MessageInterface
@@ -8,7 +8,7 @@ namespace App\Services\Bot\Message;
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  07.08.2019
  */
-interface MessageInterface
+interface AnswerInterface
 {
     /**
      * Message text
