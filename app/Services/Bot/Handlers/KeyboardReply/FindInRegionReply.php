@@ -4,6 +4,7 @@ namespace App\Services\Bot\Handlers\KeyboardReply;
 
 use App\Models\City;
 use App\Models\Region;
+use App\Services\Bot\Answer\SelectOptionAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -57,21 +58,16 @@ class FindInRegionReply extends AbstractUpdateHandler implements KeyboardReplyHa
         );
 
         /** @var City[]|Collection $cities */
-        $cities = Cache::remember("cities_{$region->id}", City::CACHE_LIFE_TIME, function () use ($region) {
+        $cities = Cache::remember("cities_in_region_{$region->id}", City::CACHE_LIFE_TIME, function () use ($region) {
             return $region->cities()
                 ->has('churches')
                 ->orderBy('name')
                 ->get();
-        });
+        })->map(function (City $city) {
+            return [[ "text" => $city->name ]];
+        })->toArray();
+        $answer = new SelectOptionAnswer(trans("bot.messages.text.specify_a_city"), $cities);
 
-        $keyboard = new ReplyKeyboardMarkup(
-            $cities->map(function (City $city) {
-                return [[ "text" => $city->name ]];
-            })->toArray(),
-            true,
-            true
-        );
-
-        $this->bot->reply($update->getMessage(), "Вкажи, будь ласка, місто", $keyboard);
+        $this->bot->sendTo($update->getMessage(), $answer);
     }
 }

@@ -17,6 +17,7 @@ use App\Services\Bot\Handlers\KeyboardReply\FindInRegionReply;
 use App\Services\Bot\Handlers\KeyboardReply\ShowAddressReply;
 use App\Services\Bot\Handlers\KeyboardReply\ShowByCityReply;
 use App\Services\Bot\Handlers\UpdateHandlerInterface;
+use App\Services\Bot\Answer\AnswerInterface;
 use Closure;
 use Illuminate\Log\Logger;
 use TelegramBot\Api\BotApi;
@@ -40,6 +41,14 @@ class Bot
      * @var int
      */
     public const CACHE_INLINE_MODE_LIFE_TIME = 60 * 60;
+
+    /**
+     * Message parse format
+     *
+     * @var string
+     */
+    public const PARSE_FORMAT_MARKDOWN = 'markdown';
+
     /**
      * Telegram bot API wrapper
      *
@@ -180,6 +189,7 @@ class Bot
         $handler = null;
 
         if ($this->isCommand($update)) {
+            $this->user = User::createFromTelegramUser($update->getMessage()->getFrom());
 
             return;
         } elseif ($this->isInlineQuery($update)) {
@@ -219,20 +229,24 @@ class Bot
     /**
      * Send reply to chat
      *
-     * @param int|string|Message $to
-     * @param      $text
-     * @param null $kb
+     * @param int|Message     $to
+     * @param AnswerInterface $message
      *
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public function reply($to, $text, $kb = null)
+    public function sendTo($to, AnswerInterface $message)
     {
-        if ($to instanceof Message) {
-            $this->getApi()->sendMessage($to->getChat()->getId(), $text, 'markdown', false, null, $kb);
-        } else {
-            $this->getApi()->sendMessage($to, $text, 'markdown', false, null, $kb);
-        }
+        $chatId = $to instanceof Message ? $to->getChat()->getId() : $to;
+
+        $this->getApi()->sendMessage(
+            $chatId,
+            $message->getText(),
+            self::PARSE_FORMAT_MARKDOWN,
+            false,
+            null,
+            $message->getMarkup()
+        );
     }
 
     /**

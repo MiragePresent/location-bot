@@ -3,8 +3,9 @@
 namespace App\Services\Bot\Handlers\KeyboardReply;
 
 use App\Models\Church;
+use App\Services\Bot\DataType\ObjectData;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
-use App\Services\Bot\Message\AddressMessage;
+use App\Services\Bot\Answer\AddressAnswer;
 use Illuminate\Support\Facades\Cache;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
@@ -54,13 +55,15 @@ class ShowAddressReply extends AbstractUpdateHandler implements KeyboardReplyHan
             }
         );
 
-        $object = $this->bot->getStorage()->getObject($church->object_id);
-        $message = new AddressMessage($object);
+        /** @var ObjectData $object */
+        $object = Cache::remember(
+            "church_object_{$church->id}",
+            Church::CACHE_LIFE_TIME,
+            function () use ($church) {
+                return $this->bot->getStorage()->getObject($church->object_id);
+            });
+        $answer = new AddressAnswer($object);
 
-        $this->bot->reply(
-            $update->getMessage()->getChat()->getId(),
-            $message->getText(),
-            $message->getMarkup()
-        );
+        $this->bot->sendTo($update->getMessage()->getChat()->getId(), $answer);
     }
 }

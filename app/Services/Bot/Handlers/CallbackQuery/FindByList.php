@@ -3,10 +3,10 @@
 namespace App\Services\Bot\Handlers\CallbackQuery;
 
 use App\Models\Region;
+use App\Services\Bot\Answer\SelectOptionAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
-use TelegramBot\Api\Types\ReplyKeyboardMarkup;
 use TelegramBot\Api\Types\Update;
 
 /**
@@ -52,18 +52,12 @@ class FindByList extends AbstractUpdateHandler implements CallbackQueryHandlerIn
             function () {
                 return Region::orderBy('name')->get();
             }
-        );
+        )->map(function (Region $region) {
+            return [["text" => $region->name ]];
+        })->toArray();
 
-        $kb = new ReplyKeyboardMarkup(
-            $regions->map(
-                function (Region $region) {
-                    return [["text" => $region->name ]];
-                }
-            )->toArray(),
-            true,
-            true
-        );
+        $answer = new SelectOptionAnswer(trans("bot.messages.text.find_by_list"), $regions);
 
-        $this->bot->reply($update->getCallbackQuery()->getMessage(), "В якій області ти шукаєш церкву?", $kb);
+        $this->bot->sendTo($update->getCallbackQuery()->getMessage()->getChat()->getId(), $answer);
     }
 }
