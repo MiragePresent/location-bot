@@ -4,10 +4,10 @@ namespace App\Services\Bot\Handlers\KeyboardReply;
 
 use App\Models\Church;
 use App\Models\City;
+use App\Services\Bot\Answer\SelectOptionAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
-use TelegramBot\Api\Types\ReplyKeyboardMarkup;
 use TelegramBot\Api\Types\Update;
 use TelegramBot\Api\Types\Message;
 
@@ -77,14 +77,11 @@ class ShowByCityReply extends AbstractUpdateHandler implements KeyboardReplyHand
             return;
         }
 
-        $keyboard = new ReplyKeyboardMarkup(
-            $churches->map(function (Church $church) {
-                return [[ "text" => $church->name ]];
-            })->toArray(),
-            true,
-            true
-        );
+        $churches = $churches->map(function (Church $church) {
+            return [[ "text" => $church->name ]];
+        })->toArray();
+        $answer = new SelectOptionAnswer(trans("bot.messages.text.specify_a_church"), $churches);
 
-        $this->bot->reply($update->getMessage(), "Яка саме церква тебе цікавить?", $keyboard);
+        $this->bot->sendTo($update->getMessage(), $answer);
     }
 }

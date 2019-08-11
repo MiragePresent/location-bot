@@ -2,8 +2,8 @@
 
 namespace App\Services\Bot\Handlers\Commands;
 
-use App\Models\User;
 use App\Services\Bot\Handlers\AbstractCommandHandler;
+use App\Services\Bot\Answer\TextAnswer;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
 use TelegramBot\Api\Types\Message;
@@ -44,16 +44,7 @@ class StartCommand extends AbstractCommandHandler
             $message->getFrom()->toJson()
         ));
 
-        // Save user
-        User::createFromTelegramUser($message->getFrom());
-
-        // ⛪
-        $church = emoji("\xE2\x9B\xAA");
-
-        $text = "Привіт!\n" .
-            "Я був створений для того, щоб допомогти тобі знайти церкву {$church}";
-
-        $this->bot->reply($message, $text);
+        $this->bot->sendTo($message->getChat()->getId(), new TextAnswer(trans("bot.messages.text.start")));
 
         // Show help message
         HelpCommand::dispatch($this->bot, $message);

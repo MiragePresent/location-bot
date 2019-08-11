@@ -3,9 +3,7 @@
 namespace App\Services\Bot\Handlers\Commands;
 
 use App\Services\Bot\Handlers\AbstractCommandHandler;
-use App\Services\Bot\Handlers\CallbackQuery\FindByList;
-use App\Services\Bot\Handlers\CallbackQuery\FindByLocation;
-use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
+use App\Services\Bot\Answer\FindCommandAnswer;
 use TelegramBot\Api\Types\Message;
 
 /**
@@ -41,20 +39,8 @@ class FindCommand extends AbstractCommandHandler
             $message->getFrom()->toJson()
         ));
 
-        $text = "Ти можеш вибрати церкву із списку, " .
-            "або просто відправити мені своє розташування і я знайду найближчу до тебе церкву";
+        $answer = new FindCommandAnswer();
 
-        $byList = [
-            "text" => "Вибрати із списку",
-            "callback_data" => FindByList::CALLBACK_DATA,
-        ];
-        $byLocation = [
-            "text" => "Знайти поблизу",
-            "callback_data" => FindByLocation::CALLBACK_DATA,
-        ];
-
-        $keyboard = new InlineKeyboardMarkup([[ $byList, $byLocation ]]);
-
-        $this->bot->reply($message, $text, $keyboard);
+        $this->bot->sendTo($message->getChat()->getId(), $answer);
     }
 }
