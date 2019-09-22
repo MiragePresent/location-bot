@@ -57,18 +57,6 @@ class AddressAnswer implements AnswerInterface
      */
     public function getMarkup()
     {
-        $buttons[] = [
-            'text' => trans('bot.interface.button.show_on_the_map'),
-            'url' => $this->object->getMarkerUrl(),
-        ];
-
-        if ($this->object->facebook) {
-            $buttons[] = [
-                'text' => trans('bot.interface.button.facebook'),
-                'url' => $this->object->facebook,
-            ];
-        }
-
-        return new InlineKeyboardMarkup([$buttons]);
+        return AddressMarkupFactory::create($this->object);
     }
 }

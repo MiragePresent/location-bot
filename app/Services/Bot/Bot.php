@@ -2,15 +2,23 @@
 
 namespace App\Services\Bot;
 
+use App\Models\Action;
 use App\Models\User;
+use App\Services\Bot\Handlers\Action\IncorrectAddressReport;
+use App\Services\Bot\Handlers\CallbackQuery\CallbackQueryHandlerInterface;
+use App\Services\Bot\Handlers\CallbackQuery\CancelActions;
+use App\Services\Bot\Handlers\CallbackQuery\ConfirmAddressReport;
 use App\Services\Bot\Handlers\CallbackQuery\FindByList;
 use App\Services\Bot\Handlers\CallbackQuery\FindByLocation;
+use App\Services\Bot\Handlers\CallbackQuery\MoreFunctions;
+use App\Services\Bot\Handlers\CallbackQuery\RemoveReportButtons;
+use App\Services\Bot\Handlers\CallbackQuery\RollbackAddressReport;
+use App\Services\Bot\Handlers\CallbackQuery\StartAddressReport;
 use App\Services\Bot\Handlers\CommandHandlerInterface;
 use App\Services\Bot\Handlers\Commands\FindCommand;
 use App\Services\Bot\Handlers\Commands\HelpCommand;
 use App\Services\Bot\Handlers\Commands\StartCommand;
 use App\Services\Bot\Handlers\InlineSearch;
-use App\Services\Bot\Handlers\KeyboardReply\IncorrectMessage;
 use App\Services\Bot\Handlers\KeyboardReply\LocationReply;
 use App\Services\Bot\Handlers\KeyboardReply\KeyboardReplyHandlerInterface;
 use App\Services\Bot\Handlers\KeyboardReply\FindInRegionReply;
@@ -108,6 +116,22 @@ class Bot
     ];
 
     /**
+     * Bot callback queries handlers
+     *
+     * @var array
+     */
+    protected $callbackQueries = [
+        FindByList::class,
+        FindByLocation::class,
+        MoreFunctions::class,
+        RemoveReportButtons::class,
+        StartAddressReport::class,
+        RollbackAddressReport::class,
+        ConfirmAddressReport::class,
+        CancelActions::class,
+    ];
+
+    /**
      * Bot service constructor.
      *
      * @param Client        $client
@@ -190,6 +214,7 @@ class Bot
 
         if ($this->isCommand($update)) {
             $this->user = User::createFromTelegramUser($update->getMessage()->getFrom());
+            $this->closeActions();
 
             return;
         } elseif ($this->isInlineQuery($update)) {
@@ -200,13 +225,28 @@ class Bot
         } elseif ($this->isCallbackQuery($update)) {
             $this->user = User::createFromTelegramUser($update->getCallbackQuery()->getFrom());
 
-            if ($update->getCallbackQuery()->getData() === FindByList::CALLBACK_DATA) {
-                $handler = new FindByList($this);
-            } elseif ($update->getCallbackQuery()->getData() === FindByLocation::CALLBACK_DATA) {
-                $handler = new FindByLocation($this);
+            foreach ($this->callbackQueries as $handlerClass) {
+                /** @var CallbackQueryHandlerInterface $handlerClass */
+                if ($handlerClass::isSuitable($update->getCallbackQuery()->getData())) {
+                    $handler = new $handlerClass($this);
+
+                    break;
+                }
             }
         } elseif ($this->isMessage($update)) {
             $this->user = User::createFromTelegramUser($update->getMessage()->getFrom());
+
+            if ($this->isThereActiveAction()) {
+                /** @var Action $action */
+                $action = Action::where("user_id", $this->getUser()->id)->latest()->first();
+
+                if ($action->key === IncorrectAddressReport::ACTION_KEY) {
+                    $actionHandler = new IncorrectAddressReport($action, $this);
+                    $actionHandler->handleStage($update, $action->stage);
+                }
+
+                return;
+            }
 
             foreach ($this->replyHandlers as $handlerClass) {
                 /** @var KeyboardReplyHandlerInterface $handlerClass */
@@ -220,10 +260,9 @@ class Bot
 
         if (! ($handler instanceof UpdateHandlerInterface)) {
             $this->log("Handler not found. \nUpdate: {$update->toJson()}");
-            $handler = new IncorrectMessage($this);
+        } else {
+            $handler->handle($update);
         }
-
-        $handler->handle($update);
     }
 
     /**
@@ -348,5 +387,26 @@ class Bot
     private function isMessage(Update $update): bool
     {
         return !empty($update->getMessage());
+    }
+
+    /**
+     * Check if there is open multi step action
+     *
+     * @return bool
+     */
+    private function isThereActiveAction(): bool
+    {
+        return Action::where("user_id", $this->getUser()->id)->isActive()->count() > 0;
+    }
+
+    /**
+     * Closes the all users actions
+     */
+    private function closeActions()
+    {
+        Action::where("user_id", $this->getUser()->id)->isActive()->update([
+            "is_canceled" => true,
+            "cancel_reason" => Action::CANCEL_REASON_BY_BOT,
+        ]);
     }
 }

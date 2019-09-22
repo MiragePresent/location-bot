@@ -31,6 +31,16 @@ abstract class AbstractUpdateHandler implements UpdateHandlerInterface
     }
 
     /**
+     * Bot instance
+     *
+     * @return Bot
+     */
+    public function getBot(): Bot
+    {
+        return $this->bot;
+    }
+
+    /**
      * Run handler statically
      *
      * @param Bot    $bot

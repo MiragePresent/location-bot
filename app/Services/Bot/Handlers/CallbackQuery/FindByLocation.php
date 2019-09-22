@@ -32,6 +32,14 @@ class FindByLocation extends AbstractUpdateHandler implements CallbackQueryHandl
     /**
      * @inheritDoc
      */
+    public static function isSuitable(string $callbackData): bool
+    {
+        return $callbackData === static::CALLBACK_DATA;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function handle(Update $update): void
     {
         $this->bot->sendTo(
