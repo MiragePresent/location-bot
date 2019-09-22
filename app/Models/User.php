@@ -20,6 +20,7 @@ use TelegramBot\Api\Types\User as TelegramUser;
  * @property Carbon              $updated_at
  *
  * @property-read UserLocation[] $locations
+ * @property-read Action[] $action
  */
 class User extends Model
 {
@@ -47,6 +48,16 @@ class User extends Model
     public function locations()
     {
         return $this->hasMany(UserLocation::class);
+    }
+
+    /**
+     * User actions
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function actions()
+    {
+        return $this->hasMany(User::class)->orderBy("created_at", "desc");
     }
 
     /**

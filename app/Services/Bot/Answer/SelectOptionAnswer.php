@@ -44,6 +44,6 @@ class SelectOptionAnswer implements AnswerInterface
      */
     public function getMarkup()
     {
-        return new ReplyKeyboardMarkup($this->options, true, true);
+        return new ReplyKeyboardMarkup($this->options, true, false);
     }
 }

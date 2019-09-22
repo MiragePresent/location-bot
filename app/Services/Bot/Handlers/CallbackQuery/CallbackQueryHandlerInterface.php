@@ -19,4 +19,13 @@ interface CallbackQueryHandlerInterface
      * @link https://core.telegram.org/bots/api#callbackquery
      */
     public function getCallbackData(): string;
+
+    /**
+     * Checks if handler is suitable for this callback
+     *
+     * @param string $callbackData
+     *
+     * @return bool
+     */
+    public static function isSuitable(string $callbackData): bool;
 }
