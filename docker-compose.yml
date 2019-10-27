@@ -4,7 +4,7 @@ services:
   # PHP application container
   lumen:
     container_name: lumen
-    build: .container/docker
+    build: .container/docker/php
     image: php:own
     depends_on:
       - mysql
@@ -37,6 +37,17 @@ services:
       - ./:/app:cached
     depends_on:
       - lumen
+    networks:
+      - app_network
+
+  elastic:
+    container_name: elastic
+    build: .container/docker/elastic
+    image: elasticsearch:ukr
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
     networks:
       - app_network
 
