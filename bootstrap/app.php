@@ -78,6 +78,7 @@ $app->singleton(
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(\App\Providers\ConfigServiceProvider::class);
 $app->register(\App\Providers\BotServiceProvider::class);
+$app->register(Nord\Lumen\Elasticsearch\ElasticsearchServiceProvider::class);
 
 // Development tools
 if (env('APP_ENV') !== 'production') {
