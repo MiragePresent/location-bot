@@ -10,6 +10,7 @@ services:
       - mysql
     volumes:
       - ./:/app:cached
+      - ./container/php/php.ini-production:/usr/local/etc/php/conf.d/10-custom.ini
     networks:
       - app_network
 
