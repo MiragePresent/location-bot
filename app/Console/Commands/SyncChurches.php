@@ -97,7 +97,7 @@ class SyncChurches extends Command
      *
      * @return City|null
      */
-    public function findCity(ObjectData $object): ?City
+    private function findCity(ObjectData $object): ?City
     {
         /** @var Region $region */
         static $region;

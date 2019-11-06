@@ -6,8 +6,6 @@ use App\Console\Commands\SyncChurches;
 use App\Console\Commands\SyncGeography;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
-use Nord\Lumen\Elasticsearch\Console\CreateCommand;
-use Nord\Lumen\Elasticsearch\Console\DeleteCommand;
 
 class Kernel extends ConsoleKernel
 {
@@ -19,8 +17,6 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         SyncGeography::class,
         SyncChurches::class,
-        CreateCommand::class,
-        DeleteCommand::class,
     ];
 
     /**
