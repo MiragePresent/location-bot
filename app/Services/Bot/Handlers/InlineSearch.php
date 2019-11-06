@@ -3,10 +3,11 @@
 namespace App\Services\Bot\Handlers;
 
 use App\Models\Church;
+use App\Services\Bot\Answer\AddressAnswer;
 use App\Services\Bot\Bot;
 use App\Services\Bot\DataType\ObjectData;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Cache;
+use TelegramBot\Api\Types\Inline\InputMessageContent;
 use TelegramBot\Api\Types\Inline\QueryResult\Article;
 use TelegramBot\Api\Types\Update;
 
@@ -18,6 +19,11 @@ use TelegramBot\Api\Types\Update;
  */
 class InlineSearch extends AbstractUpdateHandler
 {
+    /**
+     * @var int
+     */
+    private const PAGINATION_LIMIT = 10;
+
     public function handle(Update $update): void
     {
         $this->bot->log(sprintf(
@@ -26,42 +32,55 @@ class InlineSearch extends AbstractUpdateHandler
             $update->getInlineQuery()->getFrom()->toJson()
         ));
 
-        $this->bot->getApi()->answerInlineQuery(
-            $update->getInlineQuery()->getId(),
-            $this->getResults($update->getInlineQuery()->getQuery(), (int) $update->getInlineQuery()->getOffset()),
-            Bot::CACHE_INLINE_MODE_LIFE_TIME
+        $results = $this->getResults(
+            $update->getInlineQuery()->getQuery(),
+            (int) $update->getInlineQuery()->getOffset()
         );
+
+        $array = "";
+        /** @var Article $a */
+        foreach ($results as $a) {
+            $array = $a->toJson() . ", ";
+        }
+        $this->getBot()->log("Results: \n" . $array);
+
+        try {
+            $this->bot->getApi()->answerInlineQuery(
+                $update->getInlineQuery()->getId(),
+                $results,
+//            Bot::CACHE_INLINE_MODE_LIFE_TIME
+                10
+            );
+        } catch (\Exception $exception) {
+            $this->getBot()->log($exception->getMessage());
+        }
     }
 
     private function getResults(string $query, int $offset): array
     {
-        /** @var Collection|Church[] $churches */
-        $churches = Cache::remember(
-            "search_like_{$query}_{$offset}",
-            Church::CACHE_LIFE_TIME,
-            function () use ($query, $offset) {
-                return Church::where('name', 'like', $query . '%')
-                    ->take(50)
-                    ->offset($offset)
-                    ->orderBy('name')
-                    ->get();
-            }
-        );
+        /** @var Church[]|Collection $churches */
+        $churches = Church::search($query)->take(30)->get();
 
-        if (!$churches->count()) {
+        if ($churches->count() <=0 ) {
+            $this->getBot()->log("Nothing found '{$query}'");
             return [];
         }
 
         return $churches->map(function (Church $church) {
             /** @var ObjectData $object */
             $object = $this->bot->getStorage()->getObject($church->object_id);
+            $result = new AddressAnswer($object);
 
             return new Article(
                 $object->id,
                 $object->getName(),
                 $object->getAddress(),
-                $object->photo
+                null,
+                null,
+                null,
+                new InputMessageContent\Text($result->getText(), Bot::PARSE_FORMAT_MARKDOWN),
+                $result->getMarkup()
             );
-        })->toArray();
+        })->all();
     }
 }

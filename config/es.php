@@ -76,14 +76,12 @@ return [
 
             'mappings' => [
                 'churches' => [
-                    'include_type_name' => false,
                     "properties" => [
-                        'name' => ['type' => 'string', 'analyzer' => 'ukrainian' ],
-                        'city' => ['type' => 'string', 'analyzer' => 'ukrainian']
+                        'name' => ['type' => 'string', 'analysis' => 'ukrainian', 'index' => true],
+                        'city' => ['type' => 'string', 'analysis' => 'ukrainian', 'index' => true],
                     ]
                 ],
                 "cities" => [
-                    'include_type_name' => false,
                     "properties" => [
                         "name" => ["type" => "string", 'analyzer' => 'ukrainian']
                     ]
