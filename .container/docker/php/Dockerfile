@@ -25,5 +25,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 WORKDIR /app
 
+COPY "memory-limit.ini" "/usr/local/etc/php/conf.d/memory-limit.ini"
+
 RUN chmod -R 775 /app && \
     chown -R www-data:www-data /app
