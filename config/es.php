@@ -77,13 +77,14 @@ return [
             'mappings' => [
                 'churches' => [
                     "properties" => [
-                        'name' => ['type' => 'string', 'analysis' => 'ukrainian', 'index' => true],
-                        'city' => ['type' => 'string', 'analysis' => 'ukrainian', 'index' => true],
+                        'name' => ['type' => 'string', 'analysis' => 'ukrainian', 'suggest_mode' => 'always'],
+                        'city' => ['type' => 'string', 'analysis' => 'ukrainian', 'suggest_mode' => 'always'],
+                        'address' => ['type' => 'string', 'analysis' => 'ukrainian'],
                     ]
                 ],
                 "cities" => [
                     "properties" => [
-                        "name" => ["type" => "string", 'analyzer' => 'ukrainian']
+                        "name" => ["type" => "string", 'analyzer' => 'ukrainian', 'suggest_mode' => 'always']
                     ]
                 ]
             ]

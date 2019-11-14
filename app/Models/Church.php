@@ -107,8 +107,9 @@ class Church extends Model
     public function toSearchableArray()
     {
         return [
-            "name" => $this->name,
+            'name' => $this->name,
             'city' => $this->city->name,
+            'address' => $this->address,
         ];
     }
 }

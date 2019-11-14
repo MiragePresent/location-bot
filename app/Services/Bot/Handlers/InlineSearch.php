@@ -19,11 +19,6 @@ use TelegramBot\Api\Types\Update;
  */
 class InlineSearch extends AbstractUpdateHandler
 {
-    /**
-     * @var int
-     */
-    private const PAGINATION_LIMIT = 10;
-
     public function handle(Update $update): void
     {
         $this->bot->log(sprintf(
@@ -58,8 +53,9 @@ class InlineSearch extends AbstractUpdateHandler
 
     private function getResults(string $query, int $offset): array
     {
-        /** @var Church[]|Collection $churches */
-        $churches = Church::search($query)->take(30)->get();
+        /** @var array|Church[]|Collection $churches */
+        $churches = Church::search($query)
+            ->get();
 
         if ($churches->count() <=0 ) {
             $this->getBot()->log("Nothing found '{$query}'");
@@ -75,9 +71,9 @@ class InlineSearch extends AbstractUpdateHandler
                 $object->id,
                 $object->getName(),
                 $object->getAddress(),
-                null,
-                null,
-                null,
+                $object->photo ? $object->photo->url : null,
+                $object->photo ? $object->photo->width : null,
+                $object->photo ? $object->photo->height : null,
                 new InputMessageContent\Text($result->getText(), Bot::PARSE_FORMAT_MARKDOWN),
                 $result->getMarkup()
             );
