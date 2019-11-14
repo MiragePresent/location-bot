@@ -4,12 +4,13 @@ services:
   # PHP application container
   lumen:
     container_name: lumen
-    build: .container/docker/php
+    build: container/php
     image: php:own
     depends_on:
       - mysql
     volumes:
       - ./:/app:cached
+      - ./container/php/php.ini-production:/usr/local/etc/php/conf.d/10-custom.ini
     networks:
       - app_network
 
@@ -33,7 +34,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - .container/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:cached
+      - ./container/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:cached
       - ./:/app:cached
     depends_on:
       - lumen
@@ -42,7 +43,7 @@ services:
 
   elastic:
     container_name: elastic
-    build: .container/docker/elastic
+    build: container/elastic
     image: elasticsearch:ukr
     environment:
       - discovery.type=single-node

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Laravel\Scout\Searchable;
 
 /**
  * Model Church
@@ -27,6 +28,8 @@ use Illuminate\Support\Facades\DB;
  */
 class Church extends Model
 {
+    use Searchable;
+
     /**
      * Cache life time in seconds (a week)
      *
@@ -88,5 +91,25 @@ class Church extends Model
                     "+ ((longitude - {$longitude})*(longitude - $longitude))"
                 )
             );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function searchableAs()
+    {
+        return "churches";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function toSearchableArray()
+    {
+        return [
+            'name' => $this->name,
+            'city' => $this->city->name,
+            'address' => $this->address,
+        ];
     }
 }

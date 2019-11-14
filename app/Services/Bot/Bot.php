@@ -32,6 +32,7 @@ use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
+use TelegramBot\Api\Types\Chat;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 
@@ -56,6 +57,14 @@ class Bot
      * @var string
      */
     public const PARSE_FORMAT_MARKDOWN = 'markdown';
+
+    /**
+     * The "typing" action key
+     *
+     * @link https://core.telegram.org/bots/api#sendchataction
+     * @var string
+     */
+    private const ACTION_TYPING = "typing";
 
     /**
      * Telegram bot API wrapper
@@ -198,7 +207,7 @@ class Bot
      */
     public function getUsername(): string
     {
-        return $this->getApi()->getMe()->getUsername();
+        return str_replace("_", "\_", $this->getApi()->getMe()->getUsername());
     }
 
     /**
@@ -213,6 +222,7 @@ class Bot
         $handler = null;
 
         if ($this->isCommand($update)) {
+            $this->setTyping($update);
             $this->user = User::createFromTelegramUser($update->getMessage()->getFrom());
             $this->closeActions();
 
@@ -235,6 +245,8 @@ class Bot
             }
         } elseif ($this->isMessage($update)) {
             $this->user = User::createFromTelegramUser($update->getMessage()->getFrom());
+
+            $this->setTyping($update);
 
             if ($this->isThereActiveAction()) {
                 /** @var Action $action */
@@ -311,6 +323,20 @@ class Bot
         }
 
         $this->logger->{$level}($message);
+    }
+
+    /**
+     * Trigger typing
+     *
+     * @param Update $update
+     */
+    public function setTyping(Update $update)
+    {
+        $chat = $update->getMessage()->getChat();
+
+        if ($chat instanceof Chat) {
+            $this->getApi()->sendChatAction($chat->getId(), self::ACTION_TYPING);
+        }
     }
 
     /**

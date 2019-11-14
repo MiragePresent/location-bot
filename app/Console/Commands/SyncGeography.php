@@ -27,7 +27,7 @@ class SyncGeography extends Command
      *
      * @var string
      */
-    protected $description = "Starts filling/synchronization countries, regions and cities from csv file to DB";
+    protected $description = "Fill/synchronize countries, regions and cities from csv file to DB";
 
     /**
      * Source file
@@ -70,6 +70,11 @@ class SyncGeography extends Command
             }
 
             $region_name = trim($segments[0]);
+
+            // Skip Kyiv as region. Use only Kyiv obl.
+            if ($region_name === "Київ") {
+                continue;
+            }
 
             $area = $segments[1];
             $city_name = $segments[2];
