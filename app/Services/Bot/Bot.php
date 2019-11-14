@@ -221,9 +221,8 @@ class Bot
 
         $handler = null;
 
-        $this->setTyping($update, true);
-
         if ($this->isCommand($update)) {
+            $this->setTyping($update);
             $this->user = User::createFromTelegramUser($update->getMessage()->getFrom());
             $this->closeActions();
 
@@ -246,6 +245,8 @@ class Bot
             }
         } elseif ($this->isMessage($update)) {
             $this->user = User::createFromTelegramUser($update->getMessage()->getFrom());
+
+            $this->setTyping($update);
 
             if ($this->isThereActiveAction()) {
                 /** @var Action $action */
@@ -328,17 +329,10 @@ class Bot
      * Trigger typing
      *
      * @param Update $update
-     *
-     * @throws Exception
      */
     public function setTyping(Update $update)
     {
-        $chat = null;
-        if ($this->isCommand($update)) {
-            $chat = $update->getMessage()->getChat();
-        } elseif ($this->isMessage($update)) {
-            $chat = $update->getMessage()->getChat();
-        }
+        $chat = $update->getMessage()->getChat();
 
         if ($chat instanceof Chat) {
             $this->getApi()->sendChatAction($chat->getId(), self::ACTION_TYPING);

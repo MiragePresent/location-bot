@@ -43,8 +43,7 @@ class InlineSearch extends AbstractUpdateHandler
             $this->bot->getApi()->answerInlineQuery(
                 $update->getInlineQuery()->getId(),
                 $results,
-//            Bot::CACHE_INLINE_MODE_LIFE_TIME
-                10
+                Bot::CACHE_INLINE_MODE_LIFE_TIME
             );
         } catch (\Exception $exception) {
             $this->getBot()->log($exception->getMessage());
