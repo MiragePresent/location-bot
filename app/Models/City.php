@@ -20,8 +20,6 @@ use Laravel\Scout\Searchable;
  */
 class City extends Model
 {
-    use Searchable;
-
     /**
      * Cache life time in seconds (a week)
      *
@@ -65,21 +63,5 @@ class City extends Model
     public function churches()
     {
         return $this->hasMany(Church::class);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function searchableAs()
-    {
-        return "cities";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function toSearchableArray()
-    {
-        return ["name" => $this->name];
     }
 }
