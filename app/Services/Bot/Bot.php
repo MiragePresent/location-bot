@@ -19,6 +19,7 @@ use App\Services\Bot\Handlers\Commands\FindCommand;
 use App\Services\Bot\Handlers\Commands\HelpCommand;
 use App\Services\Bot\Handlers\Commands\StartCommand;
 use App\Services\Bot\Handlers\InlineSearch;
+use App\Services\Bot\Handlers\KeyboardReply\IncorrectMessage;
 use App\Services\Bot\Handlers\KeyboardReply\LocationReply;
 use App\Services\Bot\Handlers\KeyboardReply\KeyboardReplyHandlerInterface;
 use App\Services\Bot\Handlers\KeyboardReply\FindInRegionReply;
@@ -217,7 +218,7 @@ class Bot
      */
     public function processUpdate(Update $update)
     {
-        $this->log("Processing update: {$update->getUpdateId()}");
+        $this->log("Processing update: {$update->toJson()}");
 
         $handler = null;
 
@@ -244,8 +245,13 @@ class Bot
                 }
             }
         } elseif ($this->isMessage($update)) {
+            if (!is_null($update->getMessage()->getEntities())) {
+                return;
+            }
+
             $this->user = User::createFromTelegramUser($update->getMessage()->getFrom());
             $this->setTyping($update);
+
 
             if ($this->isThereActiveAction()) {
                 /** @var Action $action */
@@ -270,10 +276,15 @@ class Bot
         }
 
         if (! ($handler instanceof UpdateHandlerInterface)) {
-            $this->log("Handler not found. \nUpdate: {$update->toJson()}");
-        } else {
-            $handler->handle($update);
+            $handler = new IncorrectMessage($this);
+            $this->log(sprintf(
+                "Handler not found. [%s]: Text: %s",
+                $update->getUpdateId(),
+                $this->isMessage($update) ? $update->getMessage()->getText() : 'NOT_MESSAGE_UPDATE'
+            ));
         }
+
+        $handler->handle($update);
     }
 
     /**
