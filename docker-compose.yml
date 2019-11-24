@@ -41,17 +41,6 @@ services:
     networks:
       - app_network
 
-  elastic:
-    container_name: elastic
-    build: container/elastic
-    image: elasticsearch:ukr
-    environment:
-      - discovery.type=single-node
-    ports:
-      - "9200:9200"
-    networks:
-      - app_network
-
 volumes:
   db-data:
 

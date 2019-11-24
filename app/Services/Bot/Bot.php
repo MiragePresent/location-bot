@@ -245,7 +245,6 @@ class Bot
             }
         } elseif ($this->isMessage($update)) {
             $this->user = User::createFromTelegramUser($update->getMessage()->getFrom());
-
             $this->setTyping($update);
 
             if ($this->isThereActiveAction()) {
