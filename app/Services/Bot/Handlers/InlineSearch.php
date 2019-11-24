@@ -27,7 +27,7 @@ class InlineSearch extends AbstractUpdateHandler
             $update->getInlineQuery()->getFrom()->toJson()
         ));
 
-        if (!$update->getInlineQuery()->getQuery() === '') {
+        if ($update->getInlineQuery()->getQuery() === '') {
             return;
         }
 
