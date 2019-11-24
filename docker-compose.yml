@@ -23,9 +23,20 @@ services:
     env_file:
       - .env
     volumes:
-      - db-data:/var/lib/mysql:cached
+      - ./container/data/mysql:/var/lib/mysql
     networks:
       - app_network
+    restart: always
+
+  backuper:
+    build: container/backuper
+    container_name: database-backup
+    env_file:
+      - .env
+    volumes:
+      - ./container/data/backup:/opt/mysql/backup
+    command: crond -f -d 8
+    restart: always
 
   # Web Server
   nginx:
