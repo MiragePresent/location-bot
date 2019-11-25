@@ -245,6 +245,10 @@ class Bot
                 }
             }
         } elseif ($this->isMessage($update)) {
+            // We should to ignore messages sent by bot via inline mode.
+            // The simplest (not best) way to detect those messages is to check if message contain markdown formatting
+            // Entities object exists when formatting is present in a message
+            // TODO: find right way of detecting inline mode replies
             if (!empty($update->getMessage()->getEntities())) {
                 return;
             }
