@@ -36,12 +36,23 @@ class InlineSearch extends AbstractUpdateHandler
             (int) $update->getInlineQuery()->getOffset()
         );
 
-        $array = "";
-        /** @var Article $a */
-        foreach ($results as $a) {
-            $array = $a->toJson() . ", ";
+        if (count($results) > 0) {
+            $results[] = new Article(
+                'algolia-id',
+                'Search by Algolia',
+                'A powerful hosted search API that provides product teams with the resources ' .
+                '& tools they need to create fast, relevant search.',
+                'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/12_Algolia_logo_logos-512.png',
+                null,
+                null,
+                new InputMessageContent\Text(
+                    '*Search by Algolia*' . PHP_EOL .
+                    'A powerful hosted search API that provides product teams with the resources ' .
+                    '& tools they need to create fast, relevant search.',
+                    Bot::PARSE_FORMAT_MARKDOWN
+                )
+            );
         }
-        $this->getBot()->log("Results: \n" . $array);
 
         try {
             $this->bot->getApi()->answerInlineQuery(
