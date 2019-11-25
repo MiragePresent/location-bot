@@ -13,6 +13,21 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->register(\App\Providers\ConfigServiceProvider::class);
+        $this->app->register(\App\Providers\BotServiceProvider::class);
+        $this->app->register(\Laravel\Scout\ScoutServiceProvider::class);
+
+        // Development tools
+        if (env('APP_ENV') !== 'production') {
+            $this->app->register(\Laravel\Tinker\TinkerServiceProvider::class);
+
+            $this->app->register(\NunoMaduro\Larastan\LarastanServiceProvider::class);
+            $this->app->instance('path.storage', app()->basePath() . DIRECTORY_SEPARATOR . 'storage');
+            $this->app->instance('path.config', app()->basePath() . DIRECTORY_SEPARATOR . 'config');
+
+        }
+        // $this->app->register(App\Providers\AuthServiceProvider::class);
+        // $this->app->register(App\Providers\EventServiceProvider::class);
+
     }
 }

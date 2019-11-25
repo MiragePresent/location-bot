@@ -77,16 +77,6 @@ $app->singleton(
 */
 
 $app->register(App\Providers\AppServiceProvider::class);
-$app->register(\App\Providers\ConfigServiceProvider::class);
-$app->register(\App\Providers\BotServiceProvider::class);
-$app->register(\Laravel\Scout\ScoutServiceProvider::class);
-
-// Development tools
-if (env('APP_ENV') !== 'production') {
-    $app->register(\Laravel\Tinker\TinkerServiceProvider::class);
-}
-// $app->register(App\Providers\AuthServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

@@ -3,9 +3,14 @@
 namespace App\Providers;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Lumen\Application;
 
+/**
+ * Registers and loads configurations into the app
+ *
+ * @property-read Application $app Lumen Application instance
+ */
 class ConfigServiceProvider extends ServiceProvider
 {
     /**
