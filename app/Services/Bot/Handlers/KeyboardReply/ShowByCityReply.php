@@ -30,7 +30,7 @@ class ShowByCityReply extends AbstractUpdateHandler implements KeyboardReplyHand
             City::CACHE_LIFE_TIME,
             function () use ($message) {
                 return City::has('churches')
-                    ->where('name', "like", "%" . $message->getText() . "%")
+                    ->where('name', "like", $message->getText())
                     ->first();
             }
         );
