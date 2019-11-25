@@ -5,7 +5,6 @@ namespace App\Services\Bot\Handlers\CallbackQuery;
 use App\Models\Region;
 use App\Services\Bot\Answer\SelectOptionAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use TelegramBot\Api\Types\Update;
 
@@ -53,7 +52,7 @@ class FindByList extends AbstractUpdateHandler implements CallbackQueryHandlerIn
             )
         );
 
-        /** @var Region[]|Collection $regions */
+        /** @var array $regions */
         $regions = Cache::remember(
             'regions',
             Region::CACHE_LIFE_TIME,

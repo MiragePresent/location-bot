@@ -5,10 +5,7 @@ namespace App\Services\Bot;
 use App\Services\Bot\DataType\ObjectData;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class StorageClient
@@ -46,11 +43,12 @@ class StorageClient
 
     /**
      * Load objects from API
+     * Call API for fetching churches data
      *
-     * @param int $offset
-     * @param int $limit
+     * @param int $offset Fetch offset (next item number)
+     * @param int $limit Fetching list limit
      *
-     * @return array
+     * @return array<int,ObjectData>
      * @throws GuzzleException
      */
     public function getObjects(int $offset, int $limit): array

@@ -44,7 +44,7 @@ class RollbackAddressReport extends AbstractUpdateHandler implements CallbackQue
             ->latest()
             ->first();
 
-        if (!$action) {
+        if (!$action instanceof Action) {
             throw new \InvalidArgumentException("There is no active actions");
         }
 

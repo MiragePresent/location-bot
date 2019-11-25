@@ -35,7 +35,7 @@ class ShowByCityReply extends AbstractUpdateHandler implements KeyboardReplyHand
             }
         );
 
-        return ! is_null($city);
+        return $city instanceof City;
     }
 
     /**

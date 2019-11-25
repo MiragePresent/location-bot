@@ -75,7 +75,7 @@ class SyncChurches extends Command
                 ];
 
                 if (Church::where('object_id', $objectData->id)->count()) {
-                    Church::where('object_id')
+                    Church::where('object_id', $objectData->id)
                         ->update($churchData);
                 } else {
                     Church::create($churchData);
@@ -109,7 +109,7 @@ class SyncChurches extends Command
             $region_name = substr($region_name, 0, strpos($region_name, ' '));
         }
 
-        if (!$region || $region->name !== $region_name) {
+        if (!$region instanceof Region || $region->name !== $region_name) {
             $region = Region::where('name', $region_name)->first();
 
             if (!$region) {

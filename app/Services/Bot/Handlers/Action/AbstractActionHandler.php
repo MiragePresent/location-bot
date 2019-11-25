@@ -5,6 +5,7 @@ namespace App\Services\Bot\Handlers\Action;
 use App\Models\Action;
 use App\Services\Bot\Bot;
 use Exception;
+use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 
 /**
@@ -71,10 +72,6 @@ abstract class AbstractActionHandler implements ActionInterface
      */
     public function handleStage(Update $update, int $stage): void
     {
-        if (is_null($stage)) {
-            $stage = $this->getModel()->stage;
-        }
-
         if ($stage === $this->getSteps()) {
             if ($this::$requireConfirmation) {
                 if ($this instanceof ConfirmableActionInterface) {
@@ -91,7 +88,12 @@ abstract class AbstractActionHandler implements ActionInterface
         $handlerFunc = $this->getStageHandler($stage);
         $this->getBot()->log(sprintf("Starting handling action %s [stage: %d]", $this->getKey(), $stage));
 
-        $message = $update->getMessage() ?: $update->getCallbackQuery()->getMessage();
+        /** @var Message|null $message */
+        $message = $update->getMessage();
+
+        if (!$message instanceof Message) {
+            $message = $update->getCallbackQuery()->getMessage();
+        }
 
         if (!is_callable($handlerFunc)) {
             throw new Exception("Action {$this->getKey()} stage[{$stage}] not implemented");

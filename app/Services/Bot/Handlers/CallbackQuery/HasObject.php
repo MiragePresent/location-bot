@@ -33,18 +33,18 @@ trait HasObject
     /**
      * Fetch object from storage
      *
-     * @param $objectId
+     * @param int $objectId Object (church) ID in API storage
      *
      * @return ObjectData
      */
-    private function getObject($objectId): ObjectData
+    private function getObject(int $objectId): ObjectData
     {
         /** @var ObjectData $object */
         $object = Cache::remember("object_{$objectId}", ObjectData::CACHE_LIFE_TIME, function () use ($objectId) {
             return $this->getBot()->getStorage()->getObject($objectId);
         });
 
-        if (!$object) {
+        if (!$object instanceof ObjectData) {
             throw new NotFoundHttpException("Object {$objectId} not found");
         }
 

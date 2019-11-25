@@ -41,11 +41,10 @@ class ConfirmAddressReport extends AbstractUpdateHandler implements CallbackQuer
         /** @var Action $action */
         $action = Action::whereUserId($this->bot->getUser()->id)
             ->where("key", IncorrectAddressReport::ACTION_KEY)
-            ->isActive()
             ->latest()
             ->first();
 
-        if (!$action) {
+        if (!$action instanceof Action) {
             throw new \InvalidArgumentException("There is no active actions.");
         }
 

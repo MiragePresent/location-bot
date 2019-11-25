@@ -71,7 +71,7 @@ class InlineSearch extends AbstractUpdateHandler
             $result = new AddressAnswer($object);
 
             return new Article(
-                $object->id,
+                (string) $object->id,
                 $object->getName(),
                 $object->getAddress(),
                 $object->photo ? $object->photo->url : null,

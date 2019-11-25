@@ -42,14 +42,14 @@ class RemoveReportButtons extends AbstractUpdateHandler implements CallbackQuery
 
     public function handle(Update $update): void
     {
-        $objectId = $this->getObjectId($update->getCallbackQuery()->getData());
+        $objectId = (int) $this->getObjectId($update->getCallbackQuery()->getData());
 
         /** @var ObjectData $object */
         $object = Cache::remember("object_{$objectId}", ObjectData::CACHE_LIFE_TIME, function () use ($objectId) {
             return $this->bot->getStorage()->getObject($objectId);
         });
 
-        if (!$object) {
+        if (!$object instanceof ObjectData) {
             throw new NotFoundHttpException("Object {$objectId} not found");
         }
 

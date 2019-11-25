@@ -25,6 +25,7 @@ use Laravel\Scout\Searchable;
  * @property-read null|float $distance Distance between user and church (in km)
  *
  * @method static Builder nearest(float $latitude, float $longitude)  Finds the nearest churches
+ * @method static Builder where($column, $condition, $value = null)  Finds the nearest churches
  */
 class Church extends Model
 {
@@ -98,7 +99,7 @@ class Church extends Model
      */
     public function searchableAs()
     {
-        return "churches";
+        return "churches-local";
     }
 
     /**

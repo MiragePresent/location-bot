@@ -245,7 +245,7 @@ class Bot
                 }
             }
         } elseif ($this->isMessage($update)) {
-            if (!is_null($update->getMessage()->getEntities())) {
+            if (!empty($update->getMessage()->getEntities())) {
                 return;
             }
 

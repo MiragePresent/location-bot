@@ -32,7 +32,7 @@ class ShowAddressReply extends AbstractUpdateHandler implements KeyboardReplyHan
             }
         );
 
-        return !is_null($church);
+        return $church instanceof Church;
     }
 
     /**
