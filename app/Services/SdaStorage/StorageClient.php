@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services\Bot;
+namespace App\Services\SdaStorage;
 
-use App\Services\Bot\DataType\ObjectData;
+use App\Services\SdaStorage\DataType\ObjectData;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Cache;

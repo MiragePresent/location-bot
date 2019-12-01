@@ -3,7 +3,7 @@
 namespace App\Services\Bot\Handlers\CallbackQuery;
 
 use App\Services\Bot\Answer\AddressMarkupFactory;
-use App\Services\Bot\DataType\ObjectData;
+use App\Services\SdaStorage\DataType\ObjectData;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -17,6 +17,8 @@ use TelegramBot\Api\Types\Update;
  */
 class RemoveReportButtons extends AbstractUpdateHandler implements CallbackQueryHandlerInterface
 {
+    use HasObject;
+
     /**
      * Callback identity name
      *
@@ -61,17 +63,5 @@ class RemoveReportButtons extends AbstractUpdateHandler implements CallbackQuery
             $message->getMessageId(),
             AddressMarkupFactory::create($object)
         );
-    }
-
-    /**
-     * Finds church object ID within callback data string
-     *
-     * @param string $callbackData
-     *
-     * @return string
-     */
-    private function getObjectId(string $callbackData): string
-    {
-        return str_replace(static::CALLBACK_DATA . "_", "", $callbackData);
     }
 }

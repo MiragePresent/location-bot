@@ -2,7 +2,7 @@
 
 namespace App\Services\Bot\Answer;
 
-use App\Services\Bot\DataType\ObjectData;
+use App\Services\SdaStorage\DataType\ObjectData;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
 /**

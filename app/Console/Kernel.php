@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\BotSetWebHookCommand;
 use App\Console\Commands\SyncChurches;
 use App\Console\Commands\SyncGeography;
 use Illuminate\Console\Scheduling\Schedule;
@@ -17,6 +18,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         SyncGeography::class,
         SyncChurches::class,
+        BotSetWebHookCommand::class,
     ];
 
     /**

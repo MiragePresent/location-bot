@@ -6,7 +6,7 @@ use App\Models\Church;
 use App\Models\City;
 use App\Models\Region;
 use App\Services\Bot\Bot;
-use App\Services\Bot\DataType\ObjectData;
+use App\Services\SdaStorage\DataType\ObjectData;
 use Illuminate\Console\Command;
 
 /**

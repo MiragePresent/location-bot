@@ -4,9 +4,9 @@ namespace App\Services\Bot\Handlers\CallbackQuery;
 
 use App\Models\Action;
 use App\Services\Bot\Answer\AddressMarkupFactory;
-use App\Services\Bot\DataType\ObjectData;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use App\Services\Bot\Handlers\Action\IncorrectAddressReport;
+use App\Services\SdaStorage\DataType\ObjectData;
 use TelegramBot\Api\Types\Update;
 
 /**

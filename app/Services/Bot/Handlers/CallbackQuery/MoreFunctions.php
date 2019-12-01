@@ -14,6 +14,8 @@ use TelegramBot\Api\Types\Update;
  */
 class MoreFunctions extends AbstractUpdateHandler implements CallbackQueryHandlerInterface
 {
+    use HasObject;
+
     /**
      * Callback identity name
      *
@@ -57,17 +59,5 @@ class MoreFunctions extends AbstractUpdateHandler implements CallbackQueryHandle
             $message->getMessageId(),
             new InlineKeyboardMarkup([$buttons])
         );
-    }
-
-    /**
-     * Finds church object ID within callback data string
-     *
-     * @param string $callbackData
-     *
-     * @return string
-     */
-    private function getObjectId(string $callbackData): string
-    {
-        return str_replace(static::CALLBACK_DATA . "_", "", $callbackData);
     }
 }

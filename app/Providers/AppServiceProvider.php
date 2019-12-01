@@ -14,7 +14,9 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->register(\App\Providers\ConfigServiceProvider::class);
+        $this->app->register(\App\Providers\BotApiServiceProvider::class);
         $this->app->register(\App\Providers\BotServiceProvider::class);
+        $this->app->register(\App\Providers\SdaStorageServiceProvider::class);
         $this->app->register(\Laravel\Scout\ScoutServiceProvider::class);
 
         // Development tools

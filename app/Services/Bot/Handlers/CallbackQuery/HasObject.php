@@ -3,7 +3,7 @@
 namespace App\Services\Bot\Handlers\CallbackQuery;
 
 use App\Services\Bot\Bot;
-use App\Services\Bot\DataType\ObjectData;
+use App\Services\SdaStorage\DataType\ObjectData;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -35,7 +35,7 @@ trait HasObject
      *
      * @param int $objectId Object (church) ID in API storage
      *
-     * @return ObjectData
+     * @return \App\Services\SdaStorage\DataType\ObjectData
      */
     private function getObject(int $objectId): ObjectData
     {

@@ -3,9 +3,9 @@
 namespace App\Services\Bot\Handlers\KeyboardReply;
 
 use App\Models\Church;
-use App\Services\Bot\DataType\ObjectData;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use App\Services\Bot\Answer\AddressAnswer;
+use App\Services\SdaStorage\DataType\ObjectData;
 use Illuminate\Support\Facades\Cache;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;

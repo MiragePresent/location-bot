@@ -5,7 +5,7 @@ namespace App\Services\Bot\Handlers;
 use App\Models\Church;
 use App\Services\Bot\Answer\AddressAnswer;
 use App\Services\Bot\Bot;
-use App\Services\Bot\DataType\ObjectData;
+use App\Services\SdaStorage\DataType\ObjectData;
 use Illuminate\Database\Eloquent\Collection;
 use TelegramBot\Api\Types\Inline\InputMessageContent;
 use TelegramBot\Api\Types\Inline\QueryResult\Article;

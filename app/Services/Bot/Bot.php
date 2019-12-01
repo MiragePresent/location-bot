@@ -27,6 +27,7 @@ use App\Services\Bot\Handlers\KeyboardReply\ShowAddressReply;
 use App\Services\Bot\Handlers\KeyboardReply\ShowByCityReply;
 use App\Services\Bot\Handlers\UpdateHandlerInterface;
 use App\Services\Bot\Answer\AnswerInterface;
+use App\Services\SdaStorage\StorageClient;
 use Closure;
 use Illuminate\Log\Logger;
 use TelegramBot\Api\BotApi;
