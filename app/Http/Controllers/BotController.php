@@ -16,26 +16,6 @@ use TelegramBot\Api\Types\Update;
  */
 class BotController extends Controller
 {
-    public function setWebHook(Bot $bot, Request $request)
-    {
-        $url = "https://{$request->getHost()}/bot";
-        $response = $bot->getApi()->setWebhook($url);
-
-        if ($response != 1) {
-            $debugInfo = [
-                'Host' => $request->getHost(),
-                'WebHookURL' => $url,
-                'BotAPIResponse' => $response,
-            ];
-
-            throw new Exception(sprintf(
-                "Web hook url cannot be set\nInfo: %s",
-                json_encode($debugInfo)
-            ));
-        }
-
-        echo $url . ' – ' . 'OK';
-    }
     public function webHookCallback(Bot $bot, Request $request)
     {
         try {
