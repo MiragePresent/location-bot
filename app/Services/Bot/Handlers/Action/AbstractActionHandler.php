@@ -72,7 +72,7 @@ abstract class AbstractActionHandler implements ActionInterface
      */
     public function handleStage(Update $update, int $stage): void
     {
-        if ($stage === $this->getSteps()) {
+        if ($stage >= $this->getSteps()) {
             if ($this::$requireConfirmation) {
                 if ($this instanceof ConfirmableActionInterface) {
                     $this->sendConfirmationMessage($update->getMessage());
@@ -83,6 +83,8 @@ abstract class AbstractActionHandler implements ActionInterface
                 $this->getModel()->done();
                 $this->getBot()->log(sprintf("Action %s [stage: %d] is done", $this->getKey(), $stage));
             }
+
+            return;
         }
 
         $handlerFunc = $this->getStageHandler($stage);
