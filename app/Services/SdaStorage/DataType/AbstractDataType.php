@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Bot\DataType;
+namespace App\Services\SdaStorage\DataType;
 
 /**
  * Class AbstractDataType

@@ -2,8 +2,8 @@
 
 namespace App\Services\Bot\Handlers\CallbackQuery;
 
+use App\Services\Bot\Answer\FindByLocationAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
-use TelegramBot\Api\Types\ReplyKeyboardMarkup;
 use TelegramBot\Api\Types\Update;
 
 /**
@@ -32,12 +32,19 @@ class FindByLocation extends AbstractUpdateHandler implements CallbackQueryHandl
     /**
      * @inheritDoc
      */
+    public static function isSuitable(string $callbackData): bool
+    {
+        return $callbackData === static::CALLBACK_DATA;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function handle(Update $update): void
     {
-        $kb = new ReplyKeyboardMarkup([[
-            ["text" => "Я зараз тут", "request_location" => true]
-        ]], true, true);
-
-        $this->bot->reply($update->getCallbackQuery()->getMessage(), "Де ти зараз знаходишся?", $kb);
+        $this->bot->sendTo(
+            $update->getCallbackQuery()->getMessage()->getChat()->getId(),
+            new FindByLocationAnswer()
+        );
     }
 }

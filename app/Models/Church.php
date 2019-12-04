@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Laravel\Scout\Searchable;
 
 /**
  * Model Church
@@ -24,9 +25,12 @@ use Illuminate\Support\Facades\DB;
  * @property-read null|float $distance Distance between user and church (in km)
  *
  * @method static Builder nearest(float $latitude, float $longitude)  Finds the nearest churches
+ * @method static Builder where($column, $condition, $value = null)  Finds the nearest churches
  */
 class Church extends Model
 {
+    use Searchable;
+
     /**
      * Cache life time in seconds (a week)
      *
@@ -88,5 +92,25 @@ class Church extends Model
                     "+ ((longitude - {$longitude})*(longitude - $longitude))"
                 )
             );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function searchableAs()
+    {
+        return "churches-local";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function toSearchableArray()
+    {
+        return [
+            'name' => $this->name,
+            'city' => $this->city->name,
+            'address' => $this->address,
+        ];
     }
 }

@@ -4,11 +4,10 @@ namespace App\Services\Bot\Handlers\KeyboardReply;
 
 use App\Models\City;
 use App\Models\Region;
+use App\Services\Bot\Answer\SelectOptionAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use TelegramBot\Api\Types\Message;
-use TelegramBot\Api\Types\ReplyKeyboardMarkup;
 use TelegramBot\Api\Types\Update;
 
 /**
@@ -33,7 +32,7 @@ class FindInRegionReply extends AbstractUpdateHandler implements KeyboardReplyHa
             }
         );
 
-        return ! is_null($region);
+        return $region instanceof Region;
     }
 
     /**
@@ -56,22 +55,18 @@ class FindInRegionReply extends AbstractUpdateHandler implements KeyboardReplyHa
             }
         );
 
-        /** @var City[]|Collection $cities */
-        $cities = Cache::remember("cities_{$region->id}", City::CACHE_LIFE_TIME, function () use ($region) {
+        /** @var array $cities */
+        $cities = Cache::remember("cities_in_region_{$region->id}", City::CACHE_LIFE_TIME, function () use ($region) {
             return $region->cities()
                 ->has('churches')
                 ->orderBy('name')
                 ->get();
-        });
+        })->map(function (City $city) {
+            return [[ "text" => $city->name ]];
+        })->toArray();
 
-        $keyboard = new ReplyKeyboardMarkup(
-            $cities->map(function (City $city) {
-                return [[ "text" => $city->name ]];
-            })->toArray(),
-            true,
-            true
-        );
+        $answer = new SelectOptionAnswer(trans("bot.messages.text.specify_a_city"), $cities);
 
-        $this->bot->reply($update->getMessage(), "Вкажи, будь ласка, місто", $keyboard);
+        $this->bot->sendTo($update->getMessage(), $answer);
     }
 }

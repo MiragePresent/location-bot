@@ -35,7 +35,7 @@ class Region extends Model
      *
      * @var array
      */
-    protected $fillable = [ 'name' ];
+    protected $fillable = [ 'country_id', 'name' ];
 
     // RELATIONS
 

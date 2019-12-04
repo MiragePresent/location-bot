@@ -1,50 +1,19 @@
 <?php
 
-namespace App\Services\Bot\DataType;
+namespace App\Services\SdaStorage\DataType;
 
 /**
- * Class ObjectData
+ * Class LocalityData
  *
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  14.06.2019
- *
- * @method ObjectData loadFrom(array $data)
  */
-class ObjectData extends AbstractDataType
+class LocalityData extends AbstractDataType
 {
-    /**
-     * Cache file time
-     *
-     * @var int
-     */
-    public const CACHE_LIFE_TIME = 14 * 24 * 60 * 60;
-
-    /**
-     * Object type church
-     *
-     * @var string
-     */
-    public const TYPE_CHURCH = 'church';
-
     /**
      * @var int
      */
     public $id;
-
-    /**
-     * @var int
-     */
-    public $number;
-
-    /**
-     * @var string
-     */
-    public $code;
-
-    /**
-     * @var string
-     */
-    public $type;
 
     /**
      * @var string
@@ -55,11 +24,6 @@ class ObjectData extends AbstractDataType
      * @var string
      */
     public $region;
-
-    /**
-     * @var string
-     */
-    public $address;
 
     /**
      * @var string
@@ -75,6 +39,13 @@ class ObjectData extends AbstractDataType
      * @var string
      */
     public $nameEn;
+
+    /**
+     * Locality address
+     *
+     * @var string
+     */
+    public $techName;
 
     /**
      * @var string
@@ -94,17 +65,7 @@ class ObjectData extends AbstractDataType
     /**
      * @var string
      */
-    public $addressUk;
-
-    /**
-     * @var string
-     */
-    public $addressRu;
-
-    /**
-     * @var string
-     */
-    public $addressEn;
+    public $placeId;
 
     /**
      * @var bool
@@ -112,40 +73,12 @@ class ObjectData extends AbstractDataType
     public $decoded;
 
     /**
-     * @var string
-     */
-    public $calendar;
-
-    /**
-     * @var string
-     */
-    public $facebook;
-
-    /**
      * @var CoordinatesData
      */
     public $coordinates;
 
-    /**
-     * @var PastorData
-     */
-    public $pastor;
-
-    /**
-     * @var LocalityData
-     */
-    public $locality;
-
-    /**
-     * @var null|PhotoData
-     */
-    public $photo;
-
     protected $dataType = [
-        'coordinates'   => CoordinatesData::class,
-        'photo'         => PhotoData::class,
-        'pastor'        => PastorData::class,
-        'locality'      => LocalityData::class,
+        'coordinates' => CoordinatesData::class,
     ];
 
     protected $aliases = [
@@ -156,9 +89,7 @@ class ObjectData extends AbstractDataType
         'region_uk' => 'regionUk',
         'region_ru' => 'regionRu',
         'region_en' => 'regionEn',
-        'address_uk' => 'addressUk',
-        'address_ru' => 'addressRu',
-        'address_en' => 'addressEn',
+        'place_id' => 'placeId',
     ];
 
     /**
@@ -207,29 +138,5 @@ class ObjectData extends AbstractDataType
         }
 
         return $region ?: 'Україна';
-    }
-
-    /**
-     * Returns default value of address
-     *
-     * @return string
-     */
-    public function getAddress(): string
-    {
-        $address = $this->address;
-
-        if (!$address) {
-            $address = $this->addressUk;
-        }
-
-        if (!$address) {
-            $address = $this->addressRu;
-        }
-
-        if (!$address) {
-            $address = $this->addressEn;
-        }
-
-        return $address ?: 'Україна';
     }
 }

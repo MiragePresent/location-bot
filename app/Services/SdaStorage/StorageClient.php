@@ -1,14 +1,11 @@
 <?php
 
-namespace App\Services\Bot;
+namespace App\Services\SdaStorage;
 
-use App\Services\Bot\DataType\ObjectData;
+use App\Services\SdaStorage\DataType\ObjectData;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class StorageClient
@@ -42,6 +39,36 @@ class StorageClient
     {
         $this->url = $url;
         $this->http = $http;
+    }
+
+    /**
+     * Load objects from API
+     * Call API for fetching churches data
+     *
+     * @param int $offset Fetch offset (next item number)
+     * @param int $limit Fetching list limit
+     *
+     * @return array<int,ObjectData>
+     * @throws GuzzleException
+     */
+    public function getObjects(int $offset, int $limit): array
+    {
+        $result = [];
+        $response = $this->http->request("GET", "{$this->url}/objects?offset={$offset}&limit={$limit}");
+
+        if ($response->getStatusCode() === 200) {
+            $json = $response->getBody()->getContents();
+            $data = json_decode($json, true);
+
+            foreach ($data['mapObjects'] as $data) {
+                $object = new ObjectData();
+                $object->loadFrom($data);
+
+                $result[] = $object;
+            }
+        }
+
+        return $result;
     }
 
     /**

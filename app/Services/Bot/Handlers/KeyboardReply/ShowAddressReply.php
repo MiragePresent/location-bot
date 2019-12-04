@@ -4,12 +4,14 @@ namespace App\Services\Bot\Handlers\KeyboardReply;
 
 use App\Models\Church;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
+use App\Services\Bot\Answer\AddressAnswer;
+use App\Services\SdaStorage\DataType\ObjectData;
 use Illuminate\Support\Facades\Cache;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 
 /**
- * Class ShowAddressReply
+ * The church address message
  *
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  11.06.2019
@@ -30,7 +32,7 @@ class ShowAddressReply extends AbstractUpdateHandler implements KeyboardReplyHan
             }
         );
 
-        return !is_null($church);
+        return $church instanceof Church;
     }
 
     /**
@@ -53,12 +55,15 @@ class ShowAddressReply extends AbstractUpdateHandler implements KeyboardReplyHan
             }
         );
 
-        $this->bot->getApi()->sendVenue(
-            $update->getMessage()->getChat()->getId(),
-            $church->latitude,
-            $church->longitude,
-            $church->name,
-            $church->address
-        );
+        /** @var ObjectData $object */
+        $object = Cache::remember(
+            "church_object_{$church->id}",
+            Church::CACHE_LIFE_TIME,
+            function () use ($church) {
+                return $this->bot->getStorage()->getObject($church->object_id);
+            });
+        $answer = new AddressAnswer($object);
+
+        $this->bot->sendTo($update->getMessage()->getChat()->getId(), $answer);
     }
 }

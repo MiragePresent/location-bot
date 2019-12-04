@@ -4,6 +4,7 @@ namespace App\Services\Bot\Handlers\KeyboardReply;
 
 use App\Models\Church;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
+use App\Services\Bot\Answer\AddressAnswer;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 
@@ -38,12 +39,11 @@ class LocationReply extends AbstractUpdateHandler implements KeyboardReplyHandle
             ->take(3)
             ->get()
             ->each(function (Church $church) use ($update) {
-                $this->bot->getApi()->sendVenue(
+                $object = $this->bot->getStorage()->getObject($church->object_id);
+
+                $this->bot->sendTo(
                     $update->getMessage()->getChat()->getId(),
-                    $church->latitude,
-                    $church->longitude,
-                    $church->name . sprintf(" (%01.2f км.)", $church->distance),
-                    $church->address
+                    new AddressAnswer($object, $church->distance)
                 );
             });
     }

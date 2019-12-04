@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Services\Bot\Bot;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use TelegramBot\Api\Types\Message;
-use TelegramBot\Api\Types\MessageEntity;
 use TelegramBot\Api\Types\Update;
 
 /**
@@ -23,36 +22,10 @@ class BotController extends Controller
             $update = new Update();
             $update->map($request->all());
 
-            Log::info(date("[Y-m-d H:i:s] >> ") . $update->toJson());
-//            Log::info("Chat ID: {$update->getMessage()->getChat()->getId()}");
-
             $bot->processUpdate($update);
-
             $bot->run();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error(date("[Y-m-d H:i:s] >> ") . $e->getMessage(), $e->getTrace());
         }
-    }
-
-    /**
-     * Creates message data type from request
-     *
-     * @param Request $request
-     *
-     * @return Message
-     */
-    protected function createMessage(Request $request): Message
-    {
-        $message = new Message();
-        $message->map($request->message);
-
-        return $message;
-    }
-
-    protected function isCommand(Message $message): bool
-    {
-        return array_reduce($message->getEntities(), function (bool $isCommand, MessageEntity $entity) {
-            return $isCommand || $entity->getType() === Bot::MESSAGE_ENTITY_TYPE_BOT_COMMAND;
-        }, false);
     }
 }

@@ -4,8 +4,7 @@ namespace App\Providers;
 
 use Apix\Log\Logger\File;
 use App\Services\Bot\Bot;
-use App\Services\Bot\StorageClient;
-use GuzzleHttp\Client as GuzzleClient;
+use App\Services\SdaStorage\StorageClient;
 use Illuminate\Log\Logger;
 use Illuminate\Support\ServiceProvider;
 use TelegramBot\Api\BotApi;
@@ -23,7 +22,8 @@ class BotServiceProvider extends ServiceProvider
         $this->app->bind(Bot::class, function () {
 
             $client = new Client(config('bot.token'));
-            $api = new BotApi(config('bot.token'));
+            $api = $this->app->get(BotApi::class);
+            $storage = $this->app->get(StorageClient::class);
 
             $fileLogger = new File(storage_path('logs/bot_activity.log'));
             $fileLogger->setMinLevel("debug")
@@ -31,10 +31,6 @@ class BotServiceProvider extends ServiceProvider
                 ->setDeferred(true);
 
             $logger = new Logger($fileLogger);
-            $storage = new StorageClient(
-                config('bot.storage_api'),
-                new GuzzleClient()
-            );
 
             return new Bot($client, $api, $storage, $logger);
         });

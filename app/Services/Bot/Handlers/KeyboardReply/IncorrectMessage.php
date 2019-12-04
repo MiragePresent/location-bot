@@ -2,8 +2,8 @@
 
 namespace App\Services\Bot\Handlers\KeyboardReply;
 
+use App\Services\Bot\Answer\TextAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
-use App\Services\Bot\Handlers\Commands\HelpCommand;
 use TelegramBot\Api\Types\Update;
 
 /**
@@ -19,10 +19,6 @@ class IncorrectMessage extends AbstractUpdateHandler
      */
     public function handle(Update $update): void
     {
-        $text = "Вибач, не можу опрацювати твій запит " . emoji("\xF0\x9F\x98\xA8") . PHP_EOL .
-            "Можливо ти хотів би переглянути ще раз мої основні можливості, тоді використай команду /" .
-            HelpCommand::COMMAND_SIGNATURE;
-
-        $this->bot->reply($update->getMessage(), $text);
+        $this->bot->sendTo($update->getMessage(), new TextAnswer(trans("bot.messages.text.incorrect_request")));
     }
 }

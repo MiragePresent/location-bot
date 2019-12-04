@@ -3,6 +3,8 @@
 namespace App\Services\Bot\Handlers\Commands;
 
 use App\Services\Bot\Handlers\AbstractCommandHandler;
+use App\Services\Bot\Answer\HelpMessage;
+use App\Services\Bot\Answer\TextAnswer;
 use TelegramBot\Api\Types\Message;
 
 /**
@@ -38,24 +40,8 @@ class HelpCommand extends AbstractCommandHandler
             $message->getFrom()->toJson()
         ));
 
-        $winking_face = emoji("\xF0\x9F\x98\x89"); // 😉
-        $list_dot = emoji("\xE2\x96\xAA"); // ▪
+        $answer = new TextAnswer(trans("bot.messages.text.help", ["bot_username" => $this->bot->getUsername()]));
 
-        $text = "Ось мої основні можливості:\n" .
-
-            // /find command description
-            "{$list_dot} Для пошуку викликай команду /" . FindCommand::COMMAND_SIGNATURE .
-            " і просто слідуй інструкціям.\n" .
-
-            // Inline mode description
-            "{$list_dot} Також ти можеш скористатись пошуком звернувшись до мене @" . $this->bot->getUsername() .
-            " та вказавши населений пункт. \n" .
-
-            // /help command description
-            "{$list_dot} для отримання довідки використовуй команду /" . static::COMMAND_SIGNATURE . "\n".
-            "\n" .
-            "Надіюсь стану тобі в нагоді {$winking_face}";
-
-        $this->bot->reply($message, $text);
+        $this->bot->sendTo($message->getChat()->getId(), $answer);
     }
 }

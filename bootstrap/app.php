@@ -35,6 +35,7 @@ $app->withEloquent();
 |
 */
 
+$app->instance('path.config', app()->basePath() . DIRECTORY_SEPARATOR . 'config');
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
     App\Exceptions\Handler::class
@@ -76,15 +77,6 @@ $app->singleton(
 */
 
 $app->register(App\Providers\AppServiceProvider::class);
-$app->register(\App\Providers\ConfigServiceProvider::class);
-$app->register(\App\Providers\BotServiceProvider::class);
-
-// Development tools
-if (env('APP_ENV') !== 'production') {
-    $app->register(\Laravel\Tinker\TinkerServiceProvider::class);
-}
-// $app->register(App\Providers\AuthServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
