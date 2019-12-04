@@ -88,6 +88,11 @@ abstract class AbstractActionHandler implements ActionInterface
         }
 
         $handlerFunc = $this->getStageHandler($stage);
+
+        if (!is_callable($handlerFunc)) {
+            throw new Exception("Action {$this->getKey()} stage[{$stage}] not implemented");
+        }
+
         $this->getBot()->log(sprintf("Starting handling action %s [stage: %d]", $this->getKey(), $stage));
 
         /** @var Message|null $message */
@@ -95,10 +100,6 @@ abstract class AbstractActionHandler implements ActionInterface
 
         if (!$message instanceof Message) {
             $message = $update->getCallbackQuery()->getMessage();
-        }
-
-        if (!is_callable($handlerFunc)) {
-            throw new Exception("Action {$this->getKey()} stage[{$stage}] not implemented");
         }
 
         // log activity
@@ -121,5 +122,5 @@ abstract class AbstractActionHandler implements ActionInterface
      *
      * @return callable
      */
-    abstract protected function getStageHandler(int $stage): callable;
+    abstract protected function getStageHandler(int $stage);
 }

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\Bot\Handlers\Action\IncorrectAddressReport;
 use App\Services\Bot\Handlers\CallbackQuery\CallbackQueryHandlerInterface;
 use App\Services\Bot\Handlers\CallbackQuery\CancelActions;
+use App\Services\Bot\Handlers\CallbackQuery\CannotProvideRightAddressActions;
 use App\Services\Bot\Handlers\CallbackQuery\ConfirmAddressReport;
 use App\Services\Bot\Handlers\CallbackQuery\FindByList;
 use App\Services\Bot\Handlers\CallbackQuery\FindByLocation;
@@ -141,6 +142,7 @@ class Bot
         RollbackAddressReport::class,
         ConfirmAddressReport::class,
         CancelActions::class,
+        CannotProvideRightAddressActions::class,
     ];
 
     /**

@@ -2,6 +2,8 @@
 
 namespace App\Services\Bot\Answer;
 
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
+
 /**
  * Simple text message
  *
@@ -18,13 +20,20 @@ class TextAnswer implements AnswerInterface
     protected $text;
 
     /**
+     * @var InlineKeyboardMarkup
+     */
+    private $markup;
+
+    /**
      * TextMessage constructor.
      *
      * @param string $text
+     * @param InlineKeyboardMarkup $markup Optional keyboard
      */
-    public function __construct(string $text)
+    public function __construct(string $text, InlineKeyboardMarkup $markup = null)
     {
         $this->text = $text;
+        $this->markup = $markup;
     }
 
     /**
@@ -54,6 +63,6 @@ class TextAnswer implements AnswerInterface
      */
     public function getMarkup()
     {
-        return null;
+        return $this->markup;
     }
 }

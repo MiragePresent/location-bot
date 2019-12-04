@@ -6,6 +6,9 @@ use App\Models\Church;
 use App\Services\Bot\Answer\ConfirmAddressReportAnswer;
 use App\Services\Bot\Answer\TextAnswer;
 use App\Services\Bot\Bot;
+use App\Services\Bot\Handlers\CallbackQuery\CancelActions;
+use App\Services\Bot\Handlers\CallbackQuery\CannotProvideRightAddressActions;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 
@@ -47,14 +50,14 @@ class IncorrectAddressReport extends AbstractActionHandler implements Confirmabl
         );
     }
 
-    protected function getStageHandler(int $stage): callable
+    protected function getStageHandler(int $stage)
     {
         $handlers = [
             // asking for street and house number
             0 => [$this, "askStreetAddress"],
         ];
 
-        return $handlers[$stage];
+        return $handlers[$stage] ?? null;
     }
 
     /**
@@ -71,7 +74,15 @@ class IncorrectAddressReport extends AbstractActionHandler implements Confirmabl
         $chatId = $message->getChat()->getId();
         $msg = new TextAnswer(trans("bot.messages.text.ask_for_the_address_correction", [
             "current_address" => $this->getChurch()->address
-        ]));
+        ]), new InlineKeyboardMarkup([[
+            [
+                "text" => trans("bot.interface.button.cannot_help"),
+                "callback_data" => CannotProvideRightAddressActions::CALLBACK_DATA,
+            ],[
+                "text" => trans("bot.interface.button.cancel"),
+                "callback_data" => CancelActions::CALLBACK_DATA,
+            ],
+        ]]));
 
         $bot->getApi()->editMessageText($chatId, $message->getMessageId(), $message->getText());
 
