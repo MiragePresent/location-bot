@@ -255,15 +255,14 @@ class Bot
                 return;
             }
 
+            $this->user = User::createFromTelegramUser($update->getMessage()->getFrom());
+            $this->setTyping($update);
+
             // Close actions if message has location
             // Actions don't support location yet
             if ($update->getMessage()->getLocation() instanceof Location) {
                 $this->closeActions();
             }
-
-            $this->user = User::createFromTelegramUser($update->getMessage()->getFrom());
-            $this->setTyping($update);
-
 
             if ($this->isThereActiveAction()) {
                 /** @var Action $action */
