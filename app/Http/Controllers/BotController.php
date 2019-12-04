@@ -22,13 +22,9 @@ class BotController extends Controller
             $update = new Update();
             $update->map($request->all());
 
-            Log::info(date("[Y-m-d H:i:s] >> ") . $update->toJson());
-//            Log::info("Chat ID: {$update->getMessage()->getChat()->getId()}");
-
             $bot->processUpdate($update);
-
             $bot->run();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error(date("[Y-m-d H:i:s] >> ") . $e->getMessage(), $e->getTrace());
         }
     }

@@ -35,6 +35,7 @@ use TelegramBot\Api\Client;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
 use TelegramBot\Api\Types\Chat;
+use TelegramBot\Api\Types\Location;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 
@@ -252,6 +253,12 @@ class Bot
             // TODO: find right way of detecting inline mode replies
             if (!empty($update->getMessage()->getEntities())) {
                 return;
+            }
+
+            // Close actions if message has location
+            // Actions don't support location yet
+            if ($update->getMessage()->getLocation() instanceof Location) {
+                $this->closeActions();
             }
 
             $this->user = User::createFromTelegramUser($update->getMessage()->getFrom());
