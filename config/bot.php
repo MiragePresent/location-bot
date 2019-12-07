@@ -12,4 +12,9 @@ return [
      * SDA objects API url
      */
     'storage_api' => 'https://api.adventist.ua',
+
+    /**
+     * Users default language
+     */
+    'default_lang' => 'uk',
 ];

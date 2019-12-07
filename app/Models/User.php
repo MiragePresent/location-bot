@@ -88,7 +88,7 @@ class User extends Model
                 'username' => $tUser->getUsername(),
                 'first_name' => $tUser->getFirstName(),
                 'last_name' => $tUser->getLastName(),
-                'lang' => $tUser->getLanguageCode(),
+                'lang' => $tUser->getLanguageCode() ?: config('bot.default_lang', 'uk'),
             ]);
         }
 
