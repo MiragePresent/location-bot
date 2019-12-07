@@ -251,8 +251,8 @@ class Bot
         } elseif ($this->isMessage($update)) {
             // TODO: find right way of detecting inline mode replies
 
-            // exit text is empty
-            if (!$update->getMessage()->getText()) {
+            // ignore not text or location messages
+            if (!$update->getMessage()->getText() && !($update->getMessage()->getLocation() instanceof Location)) {
                 return;
             }
 
