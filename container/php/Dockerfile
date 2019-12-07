@@ -23,6 +23,10 @@ RUN docker-php-ext-install gd
 # Installing composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Configuration for supporting cyrillic fonts in bash
+RUN echo "set meta-flag on" >> /etc/.inputrc \
+    echo "set convert-meta off" >> /etc/.inputrc
+
 WORKDIR /app
 
 COPY "memory-limit.ini" "/usr/local/etc/php/conf.d/memory-limit.ini"
