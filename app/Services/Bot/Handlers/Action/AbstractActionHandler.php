@@ -4,8 +4,8 @@ namespace App\Services\Bot\Handlers\Action;
 
 use App\Models\Action;
 use App\Services\Bot\Bot;
+use App\Services\Bot\Tool\UpdateTree;
 use Exception;
-use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 
 /**
@@ -16,13 +16,6 @@ use TelegramBot\Api\Types\Update;
  */
 abstract class AbstractActionHandler implements ActionInterface
 {
-    /**
-     * Action has to be confirmed
-     *
-     * @var bool
-     */
-    public static $requireConfirmation = true;
-
     /**
      * Bot service instance
      *
@@ -73,16 +66,8 @@ abstract class AbstractActionHandler implements ActionInterface
     public function handleStage(Update $update, int $stage): void
     {
         if ($stage >= $this->getSteps()) {
-            if ($this::$requireConfirmation) {
-                if ($this instanceof ConfirmableActionInterface) {
-                    $this->sendConfirmationMessage($update->getMessage());
-                } else {
-                    throw new Exception("Action has to implement Confimable");
-                }
-            } else {
-                $this->getModel()->done();
-                $this->getBot()->log(sprintf("Action %s [stage: %d] is done", $this->getKey(), $stage));
-            }
+            $this->getModel()->done();
+            $this->getBot()->log(sprintf("Action %s [stage: %d] is done", $this->getKey(), $stage));
 
             return;
         }
@@ -95,24 +80,13 @@ abstract class AbstractActionHandler implements ActionInterface
 
         $this->getBot()->log(sprintf("Starting handling action %s [stage: %d]", $this->getKey(), $stage));
 
-        /** @var Message|null $message */
-        $message = $update->getMessage();
-
-        if (!$message instanceof Message) {
-            $message = $update->getCallbackQuery()->getMessage();
-        }
-
         // log activity
         $this->getModel()->activities()->create([
             "stage" => $stage,
-            "data" => ["text" => $message->getText()],
+            "data" => ["text" => UpdateTree::getMessage($update)->getText()],
         ]);
 
         call_user_func($handlerFunc, $this->getBot(), $update, $stage);
-        $this->getBot()->log(sprintf("Action %s - stage: %d is processed", $this->getKey(), $stage));
-
-        $this->getModel()->increaseStage();
-        $this->getBot()->log(sprintf("Action %s [stage: %d] is completed", $this->getKey(), $stage));
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Models\Action;
 use App\Services\Bot\Answer\AddressMarkupFactory;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use App\Services\Bot\Handlers\Action\IncorrectAddressReport;
+use App\Services\Bot\Tool\UpdateTree;
 use App\Services\SdaStorage\DataType\ObjectData;
 use TelegramBot\Api\Types\Update;
 
@@ -64,7 +65,7 @@ class StartAddressReport extends AbstractUpdateHandler implements CallbackQueryH
             "description" => IncorrectAddressReport::ACTION_DESCRIPTION,
             "steps" => IncorrectAddressReport::NUMBER_OF_STEPS,
             "arguments" => ["object_id" => $objectId],
-            "is_confirmed" => !IncorrectAddressReport::$requireConfirmation,
+            "is_confirmed" => false,
         ]);
 
         $handler = new IncorrectAddressReport($action, $this->bot);
@@ -79,12 +80,9 @@ class StartAddressReport extends AbstractUpdateHandler implements CallbackQueryH
      */
     private function restoreAddressMarkup(Update $update, ObjectData $object): void
     {
-        $message = $update->getCallbackQuery()->getMessage();
-        $chatId = $message->getChat()->getId();
-
         $this->bot->getApi()->editMessageReplyMarkup(
-            $chatId,
-            $message->getMessageId(),
+            UpdateTree::getChat($update)->getId(),
+            UpdateTree::getMessage($update)->getMessageId(),
             AddressMarkupFactory::create($object)
         );
     }
