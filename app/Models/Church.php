@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Laravel\Scout\Searchable;
 
 /**
@@ -76,21 +75,11 @@ class Church extends Model
     ): Builder {
         return $query
             ->select('*')
-            ->addSelect(DB::raw("(
-                      6371 * acos (
-                      cos ( radians({$latitude}) )
-                      * cos( radians( latitude ) )
-                      * cos( radians( longitude ) - radians({$longitude}) )
-                      + sin ( radians({$latitude}) )
-                      * sin( radians( latitude ) )
-                    )
-                ) AS `distance`
-            "))
-            ->orderBy(
-                DB::raw(
-                    "((latitude-{$latitude}) * (latitude-{$latitude}))" .
-                    "+ ((longitude - {$longitude})*(longitude - $longitude))"
-                )
+            ->orderByRaw(
+                "(
+                    (latitude - {$latitude}) * (latitude - {$latitude})) 
+                    + ((longitude - {$longitude}) * (longitude - {$longitude})
+                ) ASC"
             );
     }
 

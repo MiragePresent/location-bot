@@ -38,6 +38,6 @@ class FindCommandAnswer implements AnswerInterface
             "callback_data" => FindByLocation::CALLBACK_DATA,
         ];
 
-        return new InlineKeyboardMarkup([[ $byList, $byLocation ]]);
+        return new InlineKeyboardMarkup([[$byList], [$byLocation]]);
     }
 }

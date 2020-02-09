@@ -23,23 +23,23 @@ class AddressMarkupFactory
      */
     public static function create(ObjectData $object)
     {
-        $buttons[] = [
+        $buttons[] = [[
             'text' => trans('bot.interface.button.show_on_the_map'),
             'url' => $object->getMarkerUrl(),
-        ];
+        ]];
 
         if ($object->facebook) {
-            $buttons[] = [
+            $buttons[] = [[
                 'text' => trans('bot.interface.button.facebook'),
                 'url' => $object->facebook,
-            ];
+            ]];
         }
 
-        $buttons[] = [
+        $buttons[] = [[
             "text" => trans("bot.interface.button.more"),
             "callback_data" => MoreFunctions::CALLBACK_DATA . "_" . $object->id,
-        ];
+        ]];
 
-        return new InlineKeyboardMarkup([$buttons]);
+        return new InlineKeyboardMarkup($buttons);
     }
 }

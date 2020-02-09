@@ -2,6 +2,7 @@
 
 namespace App\Services\Bot\Answer;
 
+use App\Models\Church;
 use App\Services\Bot\Handlers\CallbackQuery\CancelActions;
 use App\Services\Bot\Handlers\CallbackQuery\ConfirmAddressReport;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
@@ -39,7 +40,16 @@ class ConfirmAddressReportAnswer implements AnswerInterface
      */
     public function getText(): string
     {
-        return trans("bot.messages.text.confirm_address_request", ["address" => $this->address]);
+        /** @var Church $church */
+        $church = Church::where('object_id', $this->objectId)->get(['name'])->first();
+
+        return trans(
+            "bot.messages.text.confirm_address_request",
+            [
+                'church' => $church->name,
+                "address" => $this->address,
+            ]
+        );
     }
 
     /**
@@ -47,14 +57,14 @@ class ConfirmAddressReportAnswer implements AnswerInterface
      */
     public function getMarkup()
     {
-        return new InlineKeyboardMarkup([[
-            [
+        return new InlineKeyboardMarkup([
+            [[
                 "text" => trans("bot.interface.button.confirm_yes"),
                 "callback_data" => ConfirmAddressReport::CALLBACK_DATA . "_" . $this->objectId,
-            ], [
+            ]], [[
                 "text" => trans("bot.interface.button.cancel"),
                 "callback_data" => CancelActions::CALLBACK_DATA,
-            ],
-        ]]);
+            ]]
+        ]);
     }
 }
