@@ -43,21 +43,21 @@ class MoreFunctions extends AbstractUpdateHandler implements CallbackQueryHandle
     {
         $objectId = $this->getObjectId($update->getCallbackQuery()->getData());
 
-        $buttons[] = [
+        $buttons[] = [[
             "text" => trans("bot.interface.button.wrong_address"),
             "callback_data" => StartAddressReport::CALLBACK_DATA . '_' . $objectId,
-        ];
-        $buttons[] = [
+        ]];
+        $buttons[] = [[
             "text" => trans("bot.interface.button.back"),
             "callback_data" => RemoveReportButtons::CALLBACK_DATA . '_' . $objectId,
-        ];
+        ]];
 
         $message = $update->getCallbackQuery()->getMessage();
         $chatId = $message->getChat()->getId();
         $this->bot->getApi()->editMessageReplyMarkup(
             $chatId,
             $message->getMessageId(),
-            new InlineKeyboardMarkup([$buttons])
+            new InlineKeyboardMarkup($buttons)
         );
     }
 }
