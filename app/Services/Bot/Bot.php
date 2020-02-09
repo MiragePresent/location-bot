@@ -224,20 +224,17 @@ class Bot
 
         $handler = null;
 
+        $this->user = User::getByUpdate($update);
+
         if ($this->isCommand($update)) {
             $this->setTyping($update);
-            $this->user = User::createFromTelegramUser($update->getMessage()->getFrom());
             $this->closeActions();
 
             return;
         } elseif ($this->isInlineQuery($update)) {
-            $this->user = User::createFromTelegramUser($update->getInlineQuery()->getFrom());
-
             $handler = new InlineSearch($this);
             $handler->handle($update);
         } elseif ($this->isCallbackQuery($update)) {
-            $this->user = User::createFromTelegramUser($update->getCallbackQuery()->getFrom());
-
             foreach ($this->callbackQueries as $handlerClass) {
                 /** @var CallbackQueryHandlerInterface $handlerClass */
                 if ($handlerClass::isSuitable($update->getCallbackQuery()->getData())) {
@@ -254,7 +251,6 @@ class Bot
                 return;
             }
 
-            $this->user = User::createFromTelegramUser($update->getMessage()->getFrom());
             $this->setTyping($update);
 
             // Close actions if message has location

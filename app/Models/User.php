@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use App\Services\Bot\Tool\UpdateTree;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use TelegramBot\Api\Types\User as TelegramUser;
+use TelegramBot\Api\Types\Update;
 
 /**
  * Model User
@@ -14,7 +15,9 @@ use TelegramBot\Api\Types\User as TelegramUser;
  *
  * @property int                 $id
  * @property int                 $telegram_id
+ * @property int                 $chat_id
  * @property string              $username
+ * @property string              $first_name
  * @property string              $lang
  * @property Carbon              $created_at
  * @property Carbon              $updated_at
@@ -31,6 +34,7 @@ class User extends Model
      */
     protected $fillable = [
         'telegram_id',
+        'chat_id',
         'username',
         'first_name',
         'lang',
@@ -73,18 +77,27 @@ class User extends Model
     }
 
     /**
-     * Create user from telegram user
-     * @param TelegramUser $tUser
+     * Return internal user by telegram update
+     *
+     * @param Update $update
      *
      * @return User
      */
-    public static function createFromTelegramUser(TelegramUser $tUser): User
+    public static function getByUpdate(Update $update): User
     {
+        $tUser = UpdateTree::getUser($update);
         $user = static::findByTelegramId($tUser->getId());
 
-        if (!$user) {
+        if ($user instanceof User) {
+            $user->update([
+                'username' => $tUser->getUsername(),
+                'first_name' => $tUser->getFirstName(),
+                'chat_id' => UpdateTree::getChat($update)->getId(),
+            ]);
+        } else {
             $user = static::create([
                 'telegram_id' => $tUser->getId(),
+                'chat_id' => UpdateTree::getChat($update)->getId(),
                 'username' => $tUser->getUsername(),
                 'first_name' => $tUser->getFirstName(),
                 'last_name' => $tUser->getLastName(),
