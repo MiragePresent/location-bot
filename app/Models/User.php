@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Bot\Exception\UpdateParseException;
 use App\Services\Bot\Tool\UpdateTree;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -87,17 +88,24 @@ class User extends Model
     {
         $tUser = UpdateTree::getUser($update);
         $user = static::findByTelegramId($tUser->getId());
+        $chatId = null;
+
+        try {
+            $chatId = UpdateTree::getChat($update)->getId();
+        } catch (UpdateParseException $exception) {
+            // Ignore exception. Chat data can be empty when user uses bot via inline bot
+        }
 
         if ($user instanceof User) {
             $user->update([
                 'username' => $tUser->getUsername(),
                 'first_name' => $tUser->getFirstName(),
-                'chat_id' => UpdateTree::getChat($update)->getId(),
+                'chat_id' => $chatId ?? $user->chat_id,
             ]);
         } else {
             $user = static::create([
                 'telegram_id' => $tUser->getId(),
-                'chat_id' => UpdateTree::getChat($update)->getId(),
+                'chat_id' => $chatId,
                 'username' => $tUser->getUsername(),
                 'first_name' => $tUser->getFirstName(),
                 'last_name' => $tUser->getLastName(),

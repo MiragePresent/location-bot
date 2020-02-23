@@ -63,4 +63,8 @@ return [
         'connection' => env('ELASTIC_CONNECTION', 'default'),
     ],
 
+    'indices' => [
+        'churches' => env('SCOUT_INDICES_CHURCHES', 'churches'),
+    ],
+
 ];

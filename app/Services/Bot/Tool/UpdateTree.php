@@ -5,6 +5,7 @@ namespace App\Services\Bot\Tool;
 use App\Services\Bot\Exception\UpdateParseException;
 use TelegramBot\Api\Types\CallbackQuery;
 use TelegramBot\Api\Types\Chat;
+use TelegramBot\Api\Types\Inline\InlineQuery;
 use TelegramBot\Api\Types\Location;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
@@ -81,6 +82,8 @@ final class UpdateTree
             && $update->getCallbackQuery()->getFrom() instanceof User
         ) {
             $user = $update->getCallbackQuery()->getFrom();
+        } elseif ($update->getInlineQuery() instanceof InlineQuery) {
+            $user = $update->getInlineQuery()->getFrom();
         } else {
             throw new UpdateParseException('Unable to find user object inside the update');
         }
