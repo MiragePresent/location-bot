@@ -88,7 +88,7 @@ class Church extends Model
      */
     public function searchableAs()
     {
-        return "churches-local";
+        return config('scout.indices.churches');
     }
 
     /**
