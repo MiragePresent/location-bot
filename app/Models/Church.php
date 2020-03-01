@@ -21,6 +21,7 @@ use Laravel\Scout\Searchable;
  * @property float     $longitude
  *
  * @property-read City $city
+ * @property-read ChurchPatch[]|null $patches Address and location patches
  * @property-read null|float $distance Distance between user and church (in km)
  *
  * @method static Builder nearest(float $latitude, float $longitude)  Finds the nearest churches
@@ -54,6 +55,8 @@ class Church extends Model
         'address',
         'latitude',
         'longitude',
+        'created_at',
+        'updated_at',
     ];
 
     // RELATIONS
@@ -68,6 +71,24 @@ class Church extends Model
         return $this->belongsTo(City::class);
     }
 
+    /**
+     * Patches relation
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function patches()
+    {
+        return $this->hasMany(ChurchPatch::class);
+    }
+
+    /**
+     * @param Builder $query
+     * @param float   $latitude
+     * @param float   $longitude
+     *
+     * @return Builder
+     * @link https://gist.github.com/statickidz/8a2f0ce3bca9badbf34970b958ef8479
+     */
     public function scopeNearest(
         Builder $query,
         float $latitude,
