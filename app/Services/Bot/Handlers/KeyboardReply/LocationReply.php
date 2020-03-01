@@ -36,20 +36,15 @@ class LocationReply extends AbstractUpdateHandler implements KeyboardReplyHandle
         $this->bot->getUser()->saveLocation($location->getLatitude(), $location->getLongitude());
 
         Church::nearest($location->getLatitude(), $location->getLongitude())
-            ->take(3)
+            ->take(15)
             ->get()
+            ->unique('address') // temporary solution
+            ->take(3)
             ->each(function (Church $church) use ($update, $location) {
                 $object = $this->bot->getStorage()->getObject($church->object_id);
-                $distance = $this->calculateDistance(
-                    $church->latitude,
-                    $church->longitude,
-                    $location->getLatitude(),
-                    $location->getLongitude()
-                );
-
                 $this->bot->sendTo(
                     $update->getMessage()->getChat()->getId(),
-                    new AddressAnswer($object, $distance)
+                    new AddressAnswer($object, $church->distance)
                 );
             });
     }

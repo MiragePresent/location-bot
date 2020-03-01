@@ -18,6 +18,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(\App\Providers\BotServiceProvider::class);
         $this->app->register(\App\Providers\SdaStorageServiceProvider::class);
         $this->app->register(\Laravel\Scout\ScoutServiceProvider::class);
+        $this->app->register(\Jcf\Geocode\GeocodeServiceProvider::class);
 
         // Development tools
         if (env('APP_ENV') !== 'production') {

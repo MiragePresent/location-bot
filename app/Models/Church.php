@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Laravel\Scout\Searchable;
 
 /**
@@ -21,6 +22,7 @@ use Laravel\Scout\Searchable;
  * @property float     $longitude
  *
  * @property-read City $city
+ * @property-read ChurchPatch[]|null $patches Address and location patches
  * @property-read null|float $distance Distance between user and church (in km)
  *
  * @method static Builder nearest(float $latitude, float $longitude)  Finds the nearest churches
@@ -54,6 +56,8 @@ class Church extends Model
         'address',
         'latitude',
         'longitude',
+        'created_at',
+        'updated_at',
     ];
 
     // RELATIONS
@@ -68,6 +72,24 @@ class Church extends Model
         return $this->belongsTo(City::class);
     }
 
+    /**
+     * Patches relation
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function patches()
+    {
+        return $this->hasMany(ChurchPatch::class);
+    }
+
+    /**
+     * @param Builder $query
+     * @param float   $latitude
+     * @param float   $longitude
+     *
+     * @return Builder
+     * @link https://gist.github.com/statickidz/8a2f0ce3bca9badbf34970b958ef8479
+     */
     public function scopeNearest(
         Builder $query,
         float $latitude,
@@ -75,6 +97,16 @@ class Church extends Model
     ): Builder {
         return $query
             ->select('*')
+            ->addSelect(DB::raw("(
+                      6371 * acos (
+                      cos ( radians({$latitude}) )
+                      * cos( radians( latitude ) )
+                      * cos( radians( longitude ) - radians({$longitude}) )
+                      + sin ( radians({$latitude}) )
+                      * sin( radians( latitude ) )
+                    )
+                ) AS `distance`
+            "))
             ->orderByRaw(
                 "(
                     (latitude - {$latitude}) * (latitude - {$latitude})) 

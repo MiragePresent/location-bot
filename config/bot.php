@@ -17,4 +17,9 @@ return [
      * Users default language
      */
     'default_lang' => 'uk',
+    
+    /**
+     * Patches file location
+     */
+    'patches_file' => database_path('source/church_patches.csv'),
 ];
