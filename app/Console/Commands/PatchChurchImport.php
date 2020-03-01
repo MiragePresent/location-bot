@@ -44,14 +44,18 @@ class PatchChurchImport extends Command
 
         $reader = new SpreadsheetReader($file);
         $fields = null;
+        $patched = 0;
 
         foreach ($reader as $row) {
             if (empty($fields)) {
                 $fields = $row;
             } else {
-                $this->createPatch(array_combine($fields, $row));
+                $updated = $this->createPatch(array_combine($fields, $row));
+                $patched += $updated ? 1 : 0;
             }
         }
+
+        $this->info($patched . ' record(s) were updated.');
     }
 
     private function createPatch(array $data)
@@ -62,7 +66,7 @@ class PatchChurchImport extends Command
         if (empty($church)) {
             $this->warn('Church object ' . $data['object_id'] . ' not found');
 
-            return;
+            return false;
         }
 
         $diff = [];
@@ -79,9 +83,7 @@ class PatchChurchImport extends Command
 
 
         if (empty($diff)) {
-            $this->warn('Church object' . $data['object_id'] . ' is identical to the patch');
-
-            return;
+            return false;
         }
 
         $church->update($diff);
@@ -93,5 +95,7 @@ class PatchChurchImport extends Command
                 'longitude' => $church->longitude
             ]]
         ));
+
+        return true;
     }
 }
