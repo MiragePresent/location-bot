@@ -18,7 +18,7 @@ class Kernel extends ConsoleKernel
         Commands\SyncChurches::class,
         Commands\BotSetWebHookCommand::class,
         Commands\PatchChurchImport::class,
-        Commands\PatchChurchCheck::class,
+//        Commands\PatchChurchGenerate::class,
     ];
 
     /**
