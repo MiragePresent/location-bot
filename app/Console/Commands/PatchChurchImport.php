@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\Church;
-use App\Models\ChurchPatch;
 use Illuminate\Console\Command;
 use SpreadsheetReader;
 
@@ -68,11 +67,16 @@ class PatchChurchImport extends Command
 
         $diff = [];
 
-        foreach (['address', 'latitude', 'longitude'] as $param) {
-            if ($church->{$param} !== $data[$param]) {
-                $diff[$param] = $data[$param];
-            }
+        if ($data['address'] !== $church->address) {
+            $diff['address'] = $data['address'];
         }
+        if ((float) $data['latitude'] !== (float) $church->latitude) {
+            $diff['latitude'] = (float)$data['latitude'];
+        }
+        if ((float) $data['longitude'] !== (float) $church->longitude) {
+            $diff['longitude'] = (float)$data['latitude'];
+        }
+
 
         if (empty($diff)) {
             $this->warn('Church object' . $data['object_id'] . ' is identical to the patch');
