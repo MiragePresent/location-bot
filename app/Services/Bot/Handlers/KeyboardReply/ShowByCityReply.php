@@ -3,9 +3,9 @@
 namespace App\Services\Bot\Handlers\KeyboardReply;
 
 use App\Models\Church;
-use App\Models\City;
 use App\Services\Bot\Answer\SelectOptionAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
+use App\Services\Bot\Tool\UpdateTree;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use TelegramBot\Api\Types\Update;
@@ -24,18 +24,13 @@ class ShowByCityReply extends AbstractUpdateHandler implements KeyboardReplyHand
      */
     public static function isSuitable(Message $message): bool
     {
-        /** @var City $city */
-        $city = Cache::remember(
-            md5("city_{$message->getText()}"),
-            City::CACHE_LIFE_TIME,
+        return Cache::remember(
+            md5('query_' . $message->getText() . '_status'),
+            Church::CACHE_LIFE_TIME,
             function () use ($message) {
-                return City::has('churches')
-                    ->where('name', "like", $message->getText())
-                    ->first();
+                return Church::search($message->getText())->get()->count() > 0;
             }
         );
-
-        return $city instanceof City;
     }
 
     /**
@@ -49,24 +44,16 @@ class ShowByCityReply extends AbstractUpdateHandler implements KeyboardReplyHand
             $update->getMessage()->getFrom()->toJson()
         ));
 
-        /** @var City $city */
-        $city = Cache::remember(
-            md5("city_{$update->getMessage()->getText()}"),
-            City::CACHE_LIFE_TIME,
-            function () use ($update) {
-                return City::has('churches')
-                    ->where('name', "%" . $update->getMessage()->getText() . "%")
-                    ->orderBy('name')
-                    ->first();
-            }
-        );
+        $message = UpdateTree::getMessage($update);
 
         /** @var Church[]|Collection $churches */
         $churches = Cache::remember(
-            "churches_{$city->id}",
+            md5("churches_" . $message->getText()),
             Church::CACHE_LIFE_TIME,
-            function () use ($city) {
-                return $city->churches;
+            function () use ($message) {
+                return Church::search($message->getText())
+                    ->orderBy('name')
+                    ->get();
             }
         );
 

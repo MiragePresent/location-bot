@@ -8,11 +8,13 @@ services:
     image: php:own
     depends_on:
       - mysql
+      - elastic
     volumes:
       - ./:/app:cached
       - ./container/php/php.ini-production:/usr/local/etc/php/conf.d/10-custom.ini
     networks:
       - app_network
+
 
   # Database container
   mysql:
@@ -22,6 +24,7 @@ services:
       - "3306:3306"
     env_file:
       - .env
+      - .env.docker-dev
     volumes:
       - ./container/data/mysql:/var/lib/mysql
     networks:
@@ -51,6 +54,23 @@ services:
       - lumen
     networks:
       - app_network
+
+  elastic:
+    container_name: elastic
+    build: container/elastic
+    ports:
+      - "127.0.0.1:9200:9200"
+    environment:
+      - "node.name=location-bot-master"
+      - "discovery.type=single-node"
+      - "bootstrap.memory_lock=true"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - ./container/data/elastic:/usr/share/elasticsearch/data
+      - ./container/elastic/synonyms:/usr/share/elasticsearch /config/synonyms
+    networks:
+      - app_network
+    restart: on-failure
 
 volumes:
   db-data:
