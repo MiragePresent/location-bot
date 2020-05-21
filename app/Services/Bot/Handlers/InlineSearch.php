@@ -6,6 +6,7 @@ use App\Models\Church;
 use App\Services\Bot\Answer\AddressAnswer;
 use App\Services\Bot\Bot;
 use App\Services\SdaStorage\DataType\ObjectData;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use TelegramBot\Api\Types\Inline\InputMessageContent;
 use TelegramBot\Api\Types\Inline\QueryResult\Article;
@@ -36,31 +37,13 @@ class InlineSearch extends AbstractUpdateHandler
             (int) $update->getInlineQuery()->getOffset()
         );
 
-        if (count($results) > 0) {
-            $results[] = new Article(
-                'algolia-id',
-                'Search by Algolia',
-                'A powerful hosted search API that provides product teams with the resources ' .
-                '& tools they need to create fast, relevant search.',
-                'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/12_Algolia_logo_logos-512.png',
-                null,
-                null,
-                new InputMessageContent\Text(
-                    '*Search by Algolia*' . PHP_EOL .
-                    'A powerful hosted search API that provides product teams with the resources ' .
-                    '& tools they need to create fast, relevant search.',
-                    Bot::PARSE_FORMAT_MARKDOWN
-                )
-            );
-        }
-
         try {
             $this->bot->getApi()->answerInlineQuery(
                 $update->getInlineQuery()->getId(),
                 $results,
                 Bot::CACHE_INLINE_MODE_LIFE_TIME
             );
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->getBot()->log($exception->getMessage());
         }
     }
@@ -69,6 +52,7 @@ class InlineSearch extends AbstractUpdateHandler
     {
         /** @var array|Church[]|Collection $churches */
         $churches = Church::search($query)
+            ->take(30) // TODO: Improve it with using offset
             ->get();
 
         if ($churches->count() <=0 ) {

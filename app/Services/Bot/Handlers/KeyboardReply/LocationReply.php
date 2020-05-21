@@ -30,16 +30,12 @@ class LocationReply extends AbstractUpdateHandler implements KeyboardReplyHandle
     public function handle(Update $update): void
     {
         // Log message
-        $this->bot->log("Searching church by location. User: %s", $update->getMessage()->toJson());
+        $this->bot->log(sprintf("Searching church by location. User: %s", $update->getMessage()->toJson()));
 
         $location = $update->getMessage()->getLocation();
         $this->bot->getUser()->saveLocation($location->getLatitude(), $location->getLongitude());
 
-        Church::nearest($location->getLatitude(), $location->getLongitude())
-            ->take(15)
-            ->get()
-            ->unique('address') // temporary solution
-            ->take(3)
+        Church::searchNearest($location->getLatitude(), $location->getLongitude(), 3)
             ->each(function (Church $church) use ($update, $location) {
                 $object = $this->bot->getStorage()->getObject($church->object_id);
                 $this->bot->sendTo(
