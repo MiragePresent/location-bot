@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Basemkhirat\Elasticsearch\Query;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Laravel\Scout\Searchable;
 
@@ -38,6 +40,13 @@ class Church extends Model
      * @var int
      */
     public const CACHE_LIFE_TIME = 7 * 24 * 60 * 60;
+
+    /**
+     * Elastic search index name
+     *
+     * @var string
+     */
+    public const ELASTIC_INDEX = 'churches';
 
     /**
      * {@inheritDoc}
@@ -115,12 +124,37 @@ class Church extends Model
             );
     }
 
+    public static function searchNearest(float $latitude, float $longitude, int $limit = 10): Collection
+    {
+        /** @var Query $query */
+        $query = app('es')->type(static::ELASTIC_INDEX);
+        $results = $query
+            ->take($limit)
+            ->orderBy('_geo_distance', [
+                'location' => "POINT({$latitude} {$longitude})",
+                'order' => 'asc',
+                'unit' => 'km',
+            ])
+            ->get();
+
+        $keys = $results->pluck('_id')->values()->all();
+        /** @var static $model */
+        $model = new static();
+        $models = $model->whereIn(
+            $model->getKeyName(), $keys
+        )->get()->keyBy($model->getKeyName());
+
+        return $results->map(function ($hit) use ($models) {
+            return $models[$hit->_id];
+        });
+    }
+
     /**
      * @inheritDoc
      */
     public function searchableAs()
     {
-        return config('scout.indices.churches');
+        return self::ELASTIC_INDEX;
     }
 
     /**
@@ -132,6 +166,16 @@ class Church extends Model
             'name' => $this->name,
             'city' => $this->city->name,
             'address' => $this->address,
+            'location' => "POINT({$this->latitude} {$this->longitude})",
         ];
+    }
+
+    public function setDistanceAttribute(float $value)
+    {
+        $this->attributes['distance'] = $value;
+    }
+    public function getDistanceAttribute(): ?float
+    {
+        return $this->attributes['distance'] ?? null;
     }
 }
