@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'driver' => env('SCOUT_DRIVER', 'algolia'),
+    'driver' => env('SCOUT_DRIVER', 'es'),
 
     /*
     |--------------------------------------------------------------------------
@@ -64,7 +64,6 @@ return [
     ],
 
     'indices' => [
-        'churches' => env('SCOUT_INDICES_CHURCHES', 'churches'),
+        'churches' => env('ELASTIC_CONNECTION', 'default'),
     ],
-
 ];
