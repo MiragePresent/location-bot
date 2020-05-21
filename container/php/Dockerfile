@@ -27,9 +27,17 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN echo "set meta-flag on" >> /etc/.inputrc \
     echo "set convert-meta off" >> /etc/.inputrc
 
-WORKDIR /app
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && echo "error_reporting = E_ALL" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "display_startup_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "display_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.remote_enable=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.remote_connect_back=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.profiler_enable=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 
 COPY "memory-limit.ini" "/usr/local/etc/php/conf.d/memory-limit.ini"
 
+WORKDIR /app
 RUN chmod -R 775 /app && \
     chown -R www-data:www-data /app
