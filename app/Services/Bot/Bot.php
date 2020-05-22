@@ -123,8 +123,8 @@ class Bot
     protected $replyHandlers = [
         LocationReply::class,
         FindInRegionReply::class,
-        ShowByCityReply::class,
         ShowAddressReply::class,
+        ShowByCityReply::class,
     ];
 
     /**
