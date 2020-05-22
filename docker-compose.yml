@@ -58,7 +58,7 @@ services:
     container_name: elastic
     build: container/elastic
     ports:
-      - "127.0.0.1:9200:9200"
+      - "9200:9200"
     environment:
       - "node.name=location-bot-master"
       - "discovery.type=single-node"
