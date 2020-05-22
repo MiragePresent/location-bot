@@ -24,7 +24,6 @@ services:
       - "3306:3306"
     env_file:
       - .env
-      - .env.docker-dev
     volumes:
       - ./container/data/mysql:/var/lib/mysql
     networks:
