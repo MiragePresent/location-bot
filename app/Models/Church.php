@@ -166,7 +166,10 @@ class Church extends Model
             'name' => $this->name,
             'city' => $this->city->name,
             'address' => $this->address,
-            'location' => "POINT({$this->latitude} {$this->longitude})",
+            'location' => [
+                "lat" => $this->latitude,
+                "lon" => $this->longitude,
+            ],
         ];
     }
 
