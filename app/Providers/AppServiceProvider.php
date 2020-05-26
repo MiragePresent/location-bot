@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Repository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,9 +18,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(\App\Providers\BotApiServiceProvider::class);
         $this->app->register(\App\Providers\BotServiceProvider::class);
         $this->app->register(\App\Providers\SdaStorageServiceProvider::class);
-        $this->app->register(\Laravel\Scout\ScoutServiceProvider::class);
         $this->app->register(\Jcf\Geocode\GeocodeServiceProvider::class);
-        $this->app->register(\Basemkhirat\Elasticsearch\ElasticsearchServiceProvider::class);
+        $this->app->register(\Nord\Lumen\Elasticsearch\ElasticsearchServiceProvider::class);
+
+        $this->app->bind(Repository\LocationRepository::class, Repository\LocationRepository::class);
 
         // Development tools
         if (env('APP_ENV') !== 'production') {
@@ -30,8 +32,5 @@ class AppServiceProvider extends ServiceProvider
             $this->app->instance('path.config', app()->basePath() . DIRECTORY_SEPARATOR . 'config');
 
         }
-        // $this->app->register(App\Providers\AuthServiceProvider::class);
-        // $this->app->register(App\Providers\EventServiceProvider::class);
-
     }
 }
