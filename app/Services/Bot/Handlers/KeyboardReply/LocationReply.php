@@ -3,6 +3,7 @@
 namespace App\Services\Bot\Handlers\KeyboardReply;
 
 use App\Models\Church;
+use App\Repository\LocationRepository;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use App\Services\Bot\Answer\AddressAnswer;
 use TelegramBot\Api\Types\Message;
@@ -27,7 +28,7 @@ class LocationReply extends AbstractUpdateHandler implements KeyboardReplyHandle
     /**
      * @inheritDoc
      */
-    public function handle(Update $update): void
+    public function handle(Update $update, LocationRepository $repository): void
     {
         // Log message
         $this->bot->log(sprintf("Searching church by location. User: %s", $update->getMessage()->toJson()));
@@ -35,36 +36,14 @@ class LocationReply extends AbstractUpdateHandler implements KeyboardReplyHandle
         $location = $update->getMessage()->getLocation();
         $this->bot->getUser()->saveLocation($location->getLatitude(), $location->getLongitude());
 
-        Church::searchNearest($location->getLatitude(), $location->getLongitude(), 3)
+        $repository->findNearBy($location->getLatitude(), $location->getLongitude(), 3)
             ->each(function (Church $church) use ($update, $location) {
                 $object = $this->bot->getStorage()->getObject($church->object_id);
+
                 $this->bot->sendTo(
                     $update->getMessage()->getChat()->getId(),
                     new AddressAnswer($object, $church->distance)
                 );
             });
-    }
-
-    /**
-     * Calculate distance from one point to another (in km)
-     *
-     * @param float $aLat
-     * @param float $aLng
-     * @param float $bLat
-     * @param float $bLng
-     *
-     * @return float
-     *
-     * @link https://gist.github.com/statickidz/8a2f0ce3bca9badbf34970b958ef8479
-     */
-    private function calculateDistance(float $aLat, float $aLng, float $bLat, float $bLng): float
-    {
-        return 6371 * acos(
-            cos(deg2rad($aLat))
-            * cos(deg2rad($bLat))
-            * cos(deg2rad($bLng) - deg2rad($aLng))
-            + sin(deg2rad($aLat))
-            * sin(deg2rad($bLat))
-        );
     }
 }

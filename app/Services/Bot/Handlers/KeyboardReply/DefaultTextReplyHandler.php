@@ -3,9 +3,11 @@
 namespace App\Services\Bot\Handlers\KeyboardReply;
 
 use App\Models\Church;
+use App\Repository\LocationRepository;
 use App\Services\Bot\Answer\SelectOptionAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use App\Services\Bot\Tool\UpdateTree;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use TelegramBot\Api\Types\Update;
@@ -17,26 +19,21 @@ use TelegramBot\Api\Types\Message;
  * @author Davyd Holovii <mirage.present@gmail.com>
  * @since  11.06.2019
  */
-class ShowByCityReply extends AbstractUpdateHandler implements KeyboardReplyHandlerInterface
+class DefaultTextReplyHandler extends AbstractUpdateHandler implements KeyboardReplyHandlerInterface
 {
     /**
      * @inheritDoc
      */
     public static function isSuitable(Message $message): bool
     {
-        return Cache::remember(
-            md5('query_' . $message->getText() . '_status'),
-            Church::CACHE_LIFE_TIME,
-            function () use ($message) {
-                return Church::search($message->getText())->get()->count() > 0;
-            }
-        );
+        // THIS HANDLER MUST HAVE THE SMALLEST PRIORITY
+        return true;
     }
 
     /**
      * @inheritDoc
      */
-    public function handle(Update $update): void
+    public function handle(Update $update, LocationRepository $repository): void
     {
         $this->bot->log(sprintf(
             "Show addresses in city: %s \nFor: %s",
@@ -45,17 +42,22 @@ class ShowByCityReply extends AbstractUpdateHandler implements KeyboardReplyHand
         ));
 
         $message = UpdateTree::getMessage($update);
+        $chat = UpdateTree::getChat($update);
 
         /** @var Church[]|Collection $churches */
         $churches = Cache::remember(
             md5("churches_" . $message->getText()),
             Church::CACHE_LIFE_TIME,
-            function () use ($message) {
-                return Church::search($message->getText())
-                    ->orderBy('name')
-                    ->get();
+            function () use ($repository, $message) {
+                return $repository->findByText($message->getText())->sortBy('name');
             }
         );
+
+        $this->getBot()->log($churches->pluck('name')->implode(',') . ' count ' . $churches->count());
+
+        if ($churches->count() === 0) {
+            throw new Exception('No locations found.');
+        }
 
         if ($churches->count() === 1) {
             $update->getMessage()->setText($churches->first()->name);
@@ -64,11 +66,11 @@ class ShowByCityReply extends AbstractUpdateHandler implements KeyboardReplyHand
             return;
         }
 
-        $churches = $churches->map(function (Church $church) {
+        $keyboardOptions = $churches->map(function (Church $church) {
             return [[ "text" => $church->name ]];
-        })->toArray();
-        $answer = new SelectOptionAnswer(trans("bot.messages.text.specify_a_church"), $churches);
+        })->values()->toArray();
+        $answer = new SelectOptionAnswer(trans("bot.messages.text.specify_a_church"), $keyboardOptions);
 
-        $this->bot->sendTo($update->getMessage(), $answer);
+        $this->getBot()->sendTo($chat->getId(), $answer);
     }
 }

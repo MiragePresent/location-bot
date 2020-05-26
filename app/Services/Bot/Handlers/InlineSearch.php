@@ -3,11 +3,12 @@
 namespace App\Services\Bot\Handlers;
 
 use App\Models\Church;
+use App\Repository\LocationRepository;
 use App\Services\Bot\Answer\AddressAnswer;
 use App\Services\Bot\Bot;
 use App\Services\SdaStorage\DataType\ObjectData;
+use App\Services\SdaStorage\StorageClient;
 use Exception;
-use Illuminate\Database\Eloquent\Collection;
 use TelegramBot\Api\Types\Inline\InputMessageContent;
 use TelegramBot\Api\Types\Inline\QueryResult\Article;
 use TelegramBot\Api\Types\Update;
@@ -20,7 +21,14 @@ use TelegramBot\Api\Types\Update;
  */
 class InlineSearch extends AbstractUpdateHandler
 {
-    public function handle(Update $update): void
+    /**
+     * Count results per request in bot search result
+     *
+     * @var int
+     */
+    private const COUNT_RESULTS_PER_PAGE = 10;
+
+    public function handle(Update $update, LocationRepository $repository, StorageClient $storage): void
     {
         $this->bot->log(sprintf(
             "Inline query request: %s\nFor: %s",
@@ -32,43 +40,26 @@ class InlineSearch extends AbstractUpdateHandler
             return;
         }
 
-        $results = $this->getResults(
+        $churches = $repository->findByText(
             $update->getInlineQuery()->getQuery(),
+            self::COUNT_RESULTS_PER_PAGE,
             (int) $update->getInlineQuery()->getOffset()
         );
 
-        try {
-            $this->bot->getApi()->answerInlineQuery(
-                $update->getInlineQuery()->getId(),
-                $results,
-                Bot::CACHE_INLINE_MODE_LIFE_TIME
-            );
-        } catch (Exception $exception) {
-            $this->getBot()->log($exception->getMessage());
-        }
-    }
-
-    private function getResults(string $query, int $offset): array
-    {
-        /** @var array|Church[]|Collection $churches */
-        $churches = Church::search($query)
-            ->take(30) // TODO: Improve it with using offset
-            ->get();
-
         if ($churches->count() <=0 ) {
-            $this->getBot()->log("Nothing found '{$query}'");
-            return [];
+            $this->getBot()->log("Nothing found '{$update->getInlineQuery()->getQuery()}'");
+            return;
         }
 
-        return $churches->map(function (Church $church) {
+        $results = $churches->map(function (Church $church) use ($storage) {
             /** @var ObjectData $object */
-            $object = $this->bot->getStorage()->getObject($church->object_id);
+            $object = $storage->getObject($church->object_id);
             $result = new AddressAnswer($object);
 
             return new Article(
                 (string) $object->id,
-                $object->getName(),
-                $object->getAddress(),
+                $church->name,
+                $church->address,
                 $object->photo ? $object->photo->url : null,
                 $object->photo ? $object->photo->width : null,
                 $object->photo ? $object->photo->height : null,
@@ -76,5 +67,15 @@ class InlineSearch extends AbstractUpdateHandler
                 $result->getMarkup()
             );
         })->all();
+
+        try {
+            $this->bot->getApi()->answerInlineQuery(
+                $update->getInlineQuery()->getId(),
+                $results,1
+//                Bot::CACHE_INLINE_MODE_LIFE_TIME
+            );
+        } catch (Exception $exception) {
+            $this->getBot()->log($exception->getMessage());
+        }
     }
 }

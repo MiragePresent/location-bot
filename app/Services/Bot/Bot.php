@@ -24,8 +24,7 @@ use App\Services\Bot\Handlers\KeyboardReply\LocationReply;
 use App\Services\Bot\Handlers\KeyboardReply\KeyboardReplyHandlerInterface;
 use App\Services\Bot\Handlers\KeyboardReply\FindInRegionReply;
 use App\Services\Bot\Handlers\KeyboardReply\ShowAddressReply;
-use App\Services\Bot\Handlers\KeyboardReply\ShowByCityReply;
-use App\Services\Bot\Handlers\UpdateHandlerInterface;
+use App\Services\Bot\Handlers\KeyboardReply\DefaultTextReplyHandler;
 use App\Services\Bot\Answer\AnswerInterface;
 use App\Services\SdaStorage\StorageClient;
 use Closure;
@@ -38,6 +37,7 @@ use TelegramBot\Api\Types\Chat;
 use TelegramBot\Api\Types\Location;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
+use Throwable;
 
 /**
  * Class Bot
@@ -124,7 +124,7 @@ class Bot
         LocationReply::class,
         FindInRegionReply::class,
         ShowAddressReply::class,
-        ShowByCityReply::class,
+        DefaultTextReplyHandler::class,
     ];
 
     /**
@@ -226,71 +226,74 @@ class Bot
 
         $this->user = User::getByUpdate($update);
 
-        if ($this->isCommand($update)) {
-            $this->setTyping($update);
-            $this->closeActions();
-
-            return;
-        } elseif ($this->isInlineQuery($update)) {
-            $handler = new InlineSearch($this);
-            $handler->handle($update);
-        } elseif ($this->isCallbackQuery($update)) {
-            foreach ($this->callbackQueries as $handlerClass) {
-                /** @var CallbackQueryHandlerInterface $handlerClass */
-                if ($handlerClass::isSuitable($update->getCallbackQuery()->getData())) {
-                    $handler = new $handlerClass($this);
-
-                    break;
-                }
-            }
-        } elseif ($this->isMessage($update)) {
-            // TODO: find right way of detecting inline mode replies
-
-            // ignore not text or location messages
-            if (!$update->getMessage()->getText() && !($update->getMessage()->getLocation() instanceof Location)) {
-                return;
-            }
-
-            $this->setTyping($update);
-
-            // Close actions if message has location
-            // Actions don't support location yet
-            if ($update->getMessage()->getLocation() instanceof Location) {
+        try {
+            if ($this->isCommand($update)) {
+                $this->setTyping($update);
                 $this->closeActions();
-            }
-
-            if ($this->isThereActiveAction()) {
-                /** @var Action $action */
-                $action = Action::where("user_id", $this->getUser()->id)->latest()->first();
-
-                if ($action->key === IncorrectAddressReport::ACTION_KEY) {
-                    $actionHandler = new IncorrectAddressReport($action, $this);
-                    $actionHandler->handleStage($update, $action->stage);
-                }
 
                 return;
-            }
+            } elseif ($this->isInlineQuery($update)) {
+                $handler = new InlineSearch($this);
+            } elseif ($this->isCallbackQuery($update)) {
+                foreach ($this->callbackQueries as $handlerClass) {
+                    /** @var CallbackQueryHandlerInterface $handlerClass */
+                    if ($handlerClass::isSuitable($update->getCallbackQuery()->getData())) {
+                        $handler = new $handlerClass($this);
 
-            foreach ($this->replyHandlers as $handlerClass) {
-                /** @var KeyboardReplyHandlerInterface $handlerClass */
-                if ($handlerClass::isSuitable($update->getMessage())) {
-                    $handler = new $handlerClass($this);
+                        break;
+                    }
+                }
+            } elseif ($this->isMessage($update)) {
+                // TODO: find right way of detecting inline mode replies
 
-                    break;
+                // ignore not text or location messages
+                if (!$update->getMessage()->getText() && !($update->getMessage()->getLocation() instanceof Location)) {
+                    return;
+                }
+
+                $this->setTyping($update);
+
+                // Close actions if message has location
+                // Actions don't support location yet
+                if ($update->getMessage()->getLocation() instanceof Location) {
+                    $this->closeActions();
+                }
+
+                if ($this->isThereActiveAction()) {
+                    /** @var Action $action */
+                    $action = Action::where("user_id", $this->getUser()->id)->latest()->first();
+
+                    if ($action->key === IncorrectAddressReport::ACTION_KEY) {
+                        $actionHandler = new IncorrectAddressReport($action, $this);
+                        $actionHandler->handleStage($update, $action->stage);
+                    }
+
+                    return;
+                }
+
+                foreach ($this->replyHandlers as $handlerClass) {
+                    /** @var KeyboardReplyHandlerInterface $handlerClass */
+                    if ($handlerClass::isSuitable($update->getMessage())) {
+                        $handler = new $handlerClass($this);
+
+                        break;
+                    }
                 }
             }
-        }
 
-        if (! ($handler instanceof UpdateHandlerInterface)) {
+            app()->call([$handler, 'handle'], compact('update'));
+        } catch (Throwable $throwable) {
+            $this->log($throwable->getMessage());
             $handler = new IncorrectMessage($this);
+            $handler->handle($update);
+
             $this->log(sprintf(
-                "Handler not found. [%s]: Text: %s",
+                "Handler error. Error message: %s \nUpdate[%s]: Text: %s",
+                $throwable->getMessage(),
                 $update->getUpdateId(),
                 $this->isMessage($update) ? $update->getMessage()->getText() : 'NOT_MESSAGE_UPDATE'
             ));
         }
-
-        $handler->handle($update);
     }
 
     /**

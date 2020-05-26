@@ -19,5 +19,6 @@ interface UpdateHandlerInterface
      *
      * @param Update $update
      */
-    public function handle(Update $update): void;
+//     public function handle();
+//    public function handle(Update $update): void;
 }
