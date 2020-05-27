@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Church;
 use Illuminate\Console\Command;
-use SpreadsheetReader;
+use SpreadsheetReader_CSV;
 
 /**
  * Class PatchChurch
@@ -42,7 +42,7 @@ class PatchChurchImport extends Command
             return;
         }
 
-        $reader = new SpreadsheetReader($file);
+        $reader = new SpreadsheetReader_CSV($file, ['Delimiter' => ';']);
         $fields = null;
         $patched = 0;
 
@@ -86,15 +86,15 @@ class PatchChurchImport extends Command
             return false;
         }
 
-        $church->update($diff);
-        $church->patches()->create(array_merge(
-            $diff,
-            ['original' => [
-                'address' => $church->address,
-                'latitude' => $church->latitude,
-                'longitude' => $church->longitude
-            ]]
-        ));
+//        $church->update($diff);
+//        $church->patches()->create(array_merge(
+//            $diff,
+//            ['original' => [
+//                'address' => $church->address,
+//                'latitude' => $church->latitude,
+//                'longitude' => $church->longitude
+//            ]]
+//        ));
 
         return true;
     }
