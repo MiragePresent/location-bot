@@ -49,7 +49,14 @@ class DefaultTextReplyHandler extends AbstractUpdateHandler implements KeyboardR
             md5("churches_" . $message->getText()),
             Church::CACHE_LIFE_TIME,
             function () use ($repository, $message) {
-                return $repository->findByText($message->getText())->sortBy('name');
+                /** @var Collection|Church[] $churches */
+                $churches = Church::whereHas('city', function ($sql) use ($message) {
+                    $sql->where('name', $message->getText());
+                })->orderBy('name')->get();
+
+                return $churches->count() === 0
+                    ? $repository->findByText($message->getText())->sortBy('name')
+                    : $churches;
             }
         );
 
