@@ -47,6 +47,10 @@ class PatchChurchImport extends Command
         $patched = 0;
 
         foreach ($reader as $row) {
+            if (empty($row)) {
+                continue;
+            }
+
             if (empty($fields)) {
                 $fields = $row;
             } else {
@@ -61,10 +65,10 @@ class PatchChurchImport extends Command
     private function createPatch(array $data)
     {
         /** @var Church $church */
-        $church = Church::where('object_id', $data['object_id'] ?? null)->first();
+        $church = Church::where('object_id', $data['object_id'])->first();
 
         if (empty($church)) {
-            $this->warn('Church object ' . $data['object_id'] . ' not found');
+            $this->warn('Church object ' . ($data['object_id'] ?? null) . ' not found');
 
             return false;
         }
@@ -86,15 +90,16 @@ class PatchChurchImport extends Command
             return false;
         }
 
-//        $church->update($diff);
-//        $church->patches()->create(array_merge(
-//            $diff,
-//            ['original' => [
-//                'address' => $church->address,
-//                'latitude' => $church->latitude,
-//                'longitude' => $church->longitude
-//            ]]
-//        ));
+        $church->update($diff);
+        $church->patches()->create(array_merge(
+            $diff,
+            ['original' => [
+                'name' => $church->name,
+                'address' => $church->address,
+                'latitude' => $church->latitude,
+                'longitude' => $church->longitude
+            ]]
+        ));
 
         return true;
     }

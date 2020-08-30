@@ -21,7 +21,7 @@ class Kernel extends ConsoleKernel
         Commands\SyncChurches::class,
         Commands\BotSetWebHookCommand::class,
         Commands\PatchChurchImport::class,
-//        Commands\PatchChurchGenerate::class,
+        Commands\PatchChurchGenerate::class,
 
         CreateIndexCommand::class,
         DeleteIndexCommand::class,

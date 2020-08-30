@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Church;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
 use Jcf\Geocode\Geocode;
 
 /**
@@ -30,19 +32,23 @@ class PatchChurchGenerate extends Command
 
     /**
      * Does all the command work
+     *
+     * @param Filesystem $fileSystem
      */
-    public function handle()
+    public function handle(Filesystem $fileSystem)
     {
         $count = Church::count();
 
+        $timeMark = Carbon::now()->format('Ymdhi');
+        $fileName = sprintf('%s_churches_patch.csv', $timeMark);
+        $csvFile = storage_path('geo_decode/' . $fileName);
+
         $this->info('Checking addresses for ' . $count . ' churches');
         $progress = $this->output->createProgressBar($count);
-        $csvFile = storage_path(time() . '_churches_patch.csv');
 
-        $fs = fopen($csvFile, "w+");
-        fwrite($fs,'name,object_id,address,latitude,longitude');
+        $fileSystem->put($csvFile, 'name;object_id;address;latitude;longitude');
 
-        Church::chunk(100, function ($churches) use ($fs, $progress) {
+        Church::chunk(100, function ($churches) use ($fileSystem, $csvFile, $progress) {
             foreach ($churches as $church) {
                 $mapData = Geocode::make()->address($church->address);
 
@@ -51,21 +57,19 @@ class PatchChurchGenerate extends Command
                     || round($church->longitude, 6) !== round($mapData->longitude(), 6))
                 ) {
                     $line = sprintf(
-                        "\n%s,%s,%s,%s,%s",
-                        '"' . str_replace('"', '""', $church->name) . '"',
+                        "\n\"%s\";%s;\"%s\";%s;%s",
+                        str_replace('"', '""', $church->name),
                         $church->object_id,
-                        "\"{$church->address}\"",
+                        str_replace('"', '""', $church->address),
                         $mapData->latitude(),
                         $mapData->longitude()
                     );
-                    fwrite($fs, $line);
+                    $fileSystem->append($csvFile, $line);
                 }
 
                 $progress->advance();
             }
         });
-
-        fclose($fs);
 
         $progress->finish();
         $this->line('');

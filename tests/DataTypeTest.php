@@ -1,5 +1,7 @@
 <?php
 
+namespace Test;
+
 use App\Services\SdaStorage\DataType;
 
 /**

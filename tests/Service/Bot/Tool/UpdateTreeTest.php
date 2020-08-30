@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Unit\Service\Bot\Tool;
+namespace Test\Service\Bot\Tool;
 
 use App\Services\Bot\Exception\UpdateParseException;
 use App\Services\Bot\Tool\UpdateTree;
