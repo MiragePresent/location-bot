@@ -20,8 +20,6 @@ services:
   mysql:
     container_name: bot_mysql
     image: mysql:5.7
-    ports:
-      - "3306:3306"
     env_file:
       - .env
     volumes:
@@ -57,8 +55,6 @@ services:
   elastic:
     container_name: elastic
     build: container/elastic
-    ports:
-      - "9200:9200"
     environment:
       - "node.name=location-bot-master"
       - "discovery.type=single-node"
