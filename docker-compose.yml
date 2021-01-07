@@ -20,13 +20,16 @@ services:
   mysql:
     container_name: bot_mysql
     image: mysql:5.7
-    env_file:
-      - .env
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
     volumes:
       - ./container/data/mysql:/var/lib/mysql
     networks:
       - app_network
-    restart: always
+    restart: on-failure
 
   backuper:
     build: container/backuper
