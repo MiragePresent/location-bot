@@ -15,7 +15,6 @@ services:
     networks:
       - app_network
 
-
   # Database container
   mysql:
     container_name: bot_mysql
