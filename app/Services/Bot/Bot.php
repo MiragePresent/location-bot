@@ -10,6 +10,7 @@ use App\Services\Bot\Handlers\CallbackQuery\CancelActions;
 use App\Services\Bot\Handlers\CallbackQuery\ConfirmAddressReport;
 use App\Services\Bot\Handlers\CallbackQuery\FindByList;
 use App\Services\Bot\Handlers\CallbackQuery\FindByLocation;
+use App\Services\Bot\Handlers\CallbackQuery\HelpProjectAlert;
 use App\Services\Bot\Handlers\CallbackQuery\MoreFunctions;
 use App\Services\Bot\Handlers\CallbackQuery\RemoveReportButtons;
 use App\Services\Bot\Handlers\CallbackQuery\RollbackAddressReport;
@@ -136,6 +137,7 @@ class Bot
         FindByList::class,
         FindByLocation::class,
         MoreFunctions::class,
+        HelpProjectAlert::class,
         RemoveReportButtons::class,
         StartAddressReport::class,
         RollbackAddressReport::class,
@@ -151,8 +153,12 @@ class Bot
      * @param StorageClient $storage
      * @param Logger        $logger
      */
-    public function __construct(Client $client, BotApi $api, StorageClient $storage, Logger $logger)
-    {
+    public function __construct(
+        Client $client,
+        BotApi $api,
+        StorageClient $storage,
+        Logger $logger
+    ) {
         $this->client = $client;
         $this->api = $api;
         $this->logger = $logger;
@@ -261,7 +267,8 @@ class Bot
 
                 if ($this->isThereActiveAction()) {
                     /** @var Action $action */
-                    $action = Action::where("user_id", $this->getUser()->id)->latest()->first();
+                    $action = Action::query()
+                        ->where("user_id", $this->getUser()->id)->latest()->first();
 
                     if ($action->key === IncorrectAddressReport::ACTION_KEY) {
                         $actionHandler = new IncorrectAddressReport($action, $this);
@@ -358,6 +365,16 @@ class Bot
         }
     }
 
+    public function getSupportInfo(): array
+    {
+        return [
+            'channel' => [
+                'name' => config('bot.support.channel.name'),
+                'link' => config('bot.support.channel.link'),
+            ]
+        ];
+    }
+
     /**
      * Registers all bot command to the client
      */
@@ -441,7 +458,9 @@ class Bot
      */
     private function isThereActiveAction(): bool
     {
-        return Action::where("user_id", $this->getUser()->id)->isActive()->count() > 0;
+        return Action::isActive()
+                ->where("user_id", $this->getUser()->id)
+                ->count() > 0;
     }
 
     /**
@@ -449,9 +468,11 @@ class Bot
      */
     private function closeActions()
     {
-        Action::where("user_id", $this->getUser()->id)->isActive()->update([
-            "is_canceled" => true,
-            "cancel_reason" => Action::CANCEL_REASON_BY_BOT,
-        ]);
+        Action::isActive()
+            ->where("user_id", $this->getUser()->id)
+            ->update([
+                "is_canceled" => true,
+                "cancel_reason" => Action::CANCEL_REASON_BY_BOT,
+            ]);
     }
 }

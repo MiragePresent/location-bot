@@ -3,7 +3,6 @@
 namespace App\Services\Bot\Answer;
 
 use App\Services\SdaStorage\DataType\ObjectData;
-use App\Services\Bot\Handlers\CallbackQuery\MoreFunctions;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
 /**
@@ -35,10 +34,10 @@ class AddressMarkupFactory
             ]];
         }
 
-        $buttons[] = [[
-            "text" => trans("bot.interface.button.more"),
-            "callback_data" => MoreFunctions::CALLBACK_DATA . "_" . $object->id,
-        ]];
+//        $buttons[] = [[
+//            "text" => trans("bot.interface.button.more"),
+//            "callback_data" => MoreFunctions::CALLBACK_DATA . "_" . $object->id,
+//        ]];
 
         return new InlineKeyboardMarkup($buttons);
     }

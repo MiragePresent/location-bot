@@ -4,8 +4,10 @@ namespace App\Services\Bot\Handlers\KeyboardReply;
 
 use App\Models\Church;
 use App\Repository\LocationRepository;
+use App\Services\Bot\Answer\InaccurateDataWarningAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use App\Services\Bot\Answer\AddressAnswer;
+use App\Services\Bot\Tool\UpdateTree;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 
@@ -37,12 +39,21 @@ class LocationReply extends AbstractUpdateHandler implements KeyboardReplyHandle
         $this->bot->getUser()->saveLocation($location->getLatitude(), $location->getLongitude());
 
         $repository->findNearBy($location->getLatitude(), $location->getLongitude(), 3)
+            ->tap(function ($result) use ($update) {
+                if (count($result) > 0) {
+                    $this->getBot()->sendTo(
+                        UpdateTree::getChat($update)->getId(),
+                        new InaccurateDataWarningAnswer()
+                    );
+                }
+            })
             ->each(function (Church $church) use ($update, $location) {
                 $object = $this->bot->getStorage()->getObject($church->object_id);
 
                 $this->bot->sendTo(
                     $update->getMessage()->getChat()->getId(),
-                    new AddressAnswer($object, $church->distance)
+//                    new AddressAnswer($object, $church->distance)
+                    new AddressAnswer($object)
                 );
             });
     }

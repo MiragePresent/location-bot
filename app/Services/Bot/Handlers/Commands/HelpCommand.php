@@ -3,8 +3,9 @@
 namespace App\Services\Bot\Handlers\Commands;
 
 use App\Services\Bot\Handlers\AbstractCommandHandler;
-use App\Services\Bot\Answer\HelpMessage;
 use App\Services\Bot\Answer\TextAnswer;
+use App\Services\Bot\Handlers\CallbackQuery\HelpProjectAlert;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 use TelegramBot\Api\Types\Message;
 
 /**
@@ -40,7 +41,15 @@ class HelpCommand extends AbstractCommandHandler
             $message->getFrom()->toJson()
         ));
 
-        $answer = new TextAnswer(trans("bot.messages.text.help", ["bot_username" => $this->bot->getUsername()]));
+        $help = [
+            'text' => trans("bot.interface.button.help_project"),
+            'callback_data' => HelpProjectAlert::CALLBACK_DATA,
+        ];
+
+        $answer = new TextAnswer(
+            trans("bot.messages.text.help", ["bot_username" => $this->bot->getUsername()]),
+            new InlineKeyboardMarkup([[$help]])
+        );
 
         $this->bot->sendTo($message->getChat()->getId(), $answer);
     }

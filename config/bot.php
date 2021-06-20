@@ -17,9 +17,16 @@ return [
      * Users default language
      */
     'default_lang' => 'uk',
-    
+
     /**
      * Patches file location
      */
     'patches_file' => database_path('source/church_patches.csv'),
+
+    'support' => [
+        'channel' => [
+            'name' => env('BOT_SUPPORT_CHANNEL_NAME', 'Telegram Support'),
+            'link' => env('BOT_SUPPORT_CHANNEL_LINK', '')
+        ]
+    ],
 ];
