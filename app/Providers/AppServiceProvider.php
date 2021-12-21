@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
         if (env('APP_ENV') !== 'production') {
             $this->app->register(\Laravel\Tinker\TinkerServiceProvider::class);
 
-            $this->app->register(\NunoMaduro\Larastan\LarastanServiceProvider::class);
+//            $this->app->register(\NunoMaduro\Larastan\LarastanServiceProvider::class);
             $this->app->instance('path.storage', app()->basePath() . DIRECTORY_SEPARATOR . 'storage');
             $this->app->instance('path.config', app()->basePath() . DIRECTORY_SEPARATOR . 'config');
 

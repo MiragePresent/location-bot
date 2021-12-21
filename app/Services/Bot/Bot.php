@@ -29,7 +29,7 @@ use App\Services\Bot\Handlers\UpdateHandlerInterface;
 use App\Services\Bot\Answer\AnswerInterface;
 use App\Services\SdaStorage\StorageClient;
 use Closure;
-use Illuminate\Log\Logger;
+use Psr\Log\LoggerInterface;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
 use TelegramBot\Api\Exception;
@@ -93,7 +93,7 @@ class Bot
     /**
      * Logger
      *
-     * @var Logger
+     * @var LoggerInterface
      */
     protected $logger;
 
@@ -149,9 +149,9 @@ class Bot
      * @param Client        $client
      * @param BotApi        $api
      * @param StorageClient $storage
-     * @param Logger        $logger
+     * @param LoggerInterface        $logger
      */
-    public function __construct(Client $client, BotApi $api, StorageClient $storage, Logger $logger)
+    public function __construct(Client $client, BotApi $api, StorageClient $storage, LoggerInterface $logger)
     {
         $this->client = $client;
         $this->api = $api;
@@ -432,7 +432,7 @@ class Bot
     }
 
     /**
-     * Check if there is open multi step action
+     * Check if there is open multi steps action
      *
      * @return bool
      */

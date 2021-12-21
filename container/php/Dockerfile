@@ -25,12 +25,17 @@ RUN apk --no-cache add \
     supervisor
 
 RUN mkdir -p /var/log/supervisor
+RUN mkdir -p /var/run/php/
+RUN mkdir -p /var/run/php8-fpm/
+RUN mkdir -p /var/run/php-fpm8/
+RUN mkdir -p /var/run/php8/
 
-ADD supervisor.ini /etc/supervisor.d/supervisor.ini
+ADD php-supervisor.ini /etc/supervisor.d/php-supervisor.ini
 
 RUN ln -s /usr/bin/php8 /usr/bin/php && \
     ln -s /usr/sbin/php-fpm8 /usr/sbin/php-fpm
 
+RUN rm -rf /etc/php8/php-fpm.d/
 COPY ./php-fpm.conf /etc/php8/
 
 WORKDIR /app
@@ -39,9 +44,9 @@ RUN adduser -D -H -u 1000 -s /bin/bash www-data -G www-data
 
 RUN chown -R www-data:www-data /app
 
-EXPOSE 80 9000
+EXPOSE 9000
 
-CMD ["/usr/bin/supervisord"]
+CMD ["/usr/bin/supervisord", "-n"]
 
 FROM base as develop
 
