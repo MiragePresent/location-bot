@@ -1,35 +1,49 @@
-FROM php:7.3-fpm
+FROM alpine:3.15.0 as base
 
-# Installing dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    mariadb-client \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    libzip-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle
+RUN apk --no-cache add \
+    php8 \
+    php8-ctype \
+    php8-curl \
+    php8-fileinfo \
+    php8-iconv \
+    php8-json \
+    php8-mbstring \
+    php8-dom \
+    php8-xml \
+    php8-xmlwriter \
+    php8-pdo \
+    php8-mysqli \
+    php8-mysqlnd  \
+    php8-pdo_mysql \
+    php8-openssl \
+    php8-phar \
+    php8-tokenizer \
+    php8-zlib \
+    php8-zip \
+    php8-opcache \
+    php8-fpm \
+    supervisor
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /var/log/supervisor
 
-# Installing extensions
-RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath opcache
-RUN docker-php-ext-configure gd --with-gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/
-RUN docker-php-ext-install gd
+ADD supervisor.ini /etc/supervisor.d/supervisor.ini
 
-# Installing composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN ln -s /usr/bin/php8 /usr/bin/php && \
+    ln -s /usr/sbin/php-fpm8 /usr/sbin/php-fpm
 
-# Configuration for supporting cyrillic fonts in bash
-RUN echo "set meta-flag on" >> /etc/.inputrc \
-    echo "set convert-meta off" >> /etc/.inputrc
+COPY ./php-fpm.conf /etc/php8/
 
 WORKDIR /app
 
-COPY "memory-limit.ini" "/usr/local/etc/php/conf.d/memory-limit.ini"
+RUN adduser -D -H -u 1000 -s /bin/bash www-data -G www-data
 
-RUN chmod -R 775 /app && \
-    chown -R www-data:www-data /app
+RUN chown -R www-data:www-data /app
+
+EXPOSE 80 9000
+
+CMD ["/usr/bin/supervisord"]
+
+FROM base as develop
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
