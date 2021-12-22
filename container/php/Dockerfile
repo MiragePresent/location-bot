@@ -46,9 +46,6 @@ RUN chown -R www-data:www-data /app
 
 EXPOSE 9000
 
-CMD ["/usr/bin/supervisord", "-n"]
-
-FROM base as develop
-
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+CMD ["/usr/bin/supervisord", "-n"]

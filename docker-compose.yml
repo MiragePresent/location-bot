@@ -6,7 +6,6 @@ services:
     container_name: lumen
     build:
       context: container/php
-      target: develop
     image: bot_backend:latest
     depends_on:
       - mysql
