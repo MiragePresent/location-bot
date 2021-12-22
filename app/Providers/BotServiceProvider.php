@@ -19,18 +19,10 @@ class BotServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind(Bot::class, function () {
-
             $client = new Client(config('bot.token'));
             $api = $this->app->get(BotApi::class);
             $storage = $this->app->get(StorageClient::class);
-
-//            $fileLogger = new File(storage_path('logs/bot_activity.log'));
-//            $fileLogger->setMinLevel("debug")
-//                ->setCascading(false)
-//                ->setDeferred(true);
-
             $logger = Log::channel('bot_activity');
-//            $logger = new Logger($fileLogger);
 
             return new Bot($client, $api, $storage, $logger);
         });
