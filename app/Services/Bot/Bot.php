@@ -18,6 +18,7 @@ use App\Services\Bot\Handlers\CallbackQuery\StartAddressReport;
 use App\Services\Bot\Handlers\CommandHandlerInterface;
 use App\Services\Bot\Handlers\Commands\FindCommand;
 use App\Services\Bot\Handlers\Commands\HelpCommand;
+//  use App\Services\Bot\Handlers\Commands\PastorsHelpCommand;
 use App\Services\Bot\Handlers\Commands\StartCommand;
 use App\Services\Bot\Handlers\InlineSearch;
 use App\Services\Bot\Handlers\KeyboardReply\IncorrectMessage;
@@ -114,6 +115,7 @@ class Bot
         StartCommand::class,
         HelpCommand::class,
         FindCommand::class,
+//        PastorsHelpCommand::class,
     ];
 
     /**
@@ -216,7 +218,9 @@ class Bot
      */
     public function getUsername(): string
     {
-        return str_replace("_", "\_", $this->getApi()->getMe()->getUsername());
+        $botUsername = $this->getApi()->getMe()->getUsername() ?: config('bot.username_fallback');
+
+        return str_replace("_", "\_", $botUsername);
     }
 
     /**

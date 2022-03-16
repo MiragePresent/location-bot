@@ -39,7 +39,14 @@ class HelpCommand extends AbstractCommandHandler
             $message->getFrom()->toJson()
         ));
 
-        $answer = new TextAnswer(trans("bot.messages.text.help", ["bot_username" => $this->bot->getUsername()]));
+        $support = $this->bot->getSupportInfo();
+        $channel = $support['channel'];
+
+        $answer = new TextAnswer(trans("bot.messages.text.help", [
+            "bot_username" => $this->bot->getUsername(),
+            'support_channel_name' => $channel['name'],
+            'support_channel_link' => $channel['link'],
+        ]));
 
         $this->bot->sendTo($message->getChat()->getId(), $answer);
     }

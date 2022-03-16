@@ -8,6 +8,8 @@ return [
      */
     'token' => env('BOT_TOKEN', ''),
 
+    'username_fallback' => env('BOT_USERNAME_FALLBACK', 'sda_church_bot'),
+
     /**
      * SDA objects API url
      */
