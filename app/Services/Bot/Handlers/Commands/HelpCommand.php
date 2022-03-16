@@ -4,6 +4,7 @@ namespace App\Services\Bot\Handlers\Commands;
 
 use App\Services\Bot\Handlers\AbstractCommandHandler;
 use App\Services\Bot\Answer\TextAnswer;
+use TelegramBot\Api\HttpException;
 use TelegramBot\Api\Types\Message;
 
 /**
@@ -39,15 +40,23 @@ class HelpCommand extends AbstractCommandHandler
             $message->getFrom()->toJson()
         ));
 
-        $support = $this->bot->getSupportInfo();
-        $channel = $support['channel'];
+        try {
+            $chatId = $message->getChat()->getId();
+            $support = $this->bot->getSupportInfo();
+            $channel = $support['channel'];
 
-        $answer = new TextAnswer(trans("bot.messages.text.help", [
-            "bot_username" => $this->bot->getUsername(),
-            'support_channel_name' => $channel['name'],
-            'support_channel_link' => $channel['link'],
-        ]));
+            $answer = new TextAnswer(trans("bot.messages.text.help", [
+                "bot_username" => $this->bot->getUsername(),
+                'support_channel_name' => $channel['name'],
+                'support_channel_link' => $channel['link'],
+            ]));
 
-        $this->bot->sendTo($message->getChat()->getId(), $answer);
+            $this->bot->sendTo($chatId, $answer);
+        } catch (HttpException $apiException) {
+            $this->bot->log(sprintf(
+                "Cannot handle help message answer. \nError: %s", $apiException->getMessage()),
+                "error"
+            );
+        }
     }
 }
