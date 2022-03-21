@@ -234,6 +234,12 @@ class Bot
 
         $this->user = User::getByUpdate($update);
 
+        if (is_null($this->user)) {
+            $this->log('Update cannot be processed. User was not detected', 'warning');
+
+            return;
+        }
+
         try {
             if ($this->isCommand($update)) {
                 $this->setTyping($update);

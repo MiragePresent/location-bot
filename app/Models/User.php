@@ -82,11 +82,16 @@ class User extends Model
      *
      * @param Update $update
      *
-     * @return User
+     * @return User|null
      */
-    public static function getByUpdate(Update $update): User
+    public static function getByUpdate(Update $update): ?User
     {
-        $tUser = UpdateTree::getUser($update);
+        try {
+            $tUser = UpdateTree::getUser($update);
+        } catch (UpdateParseException $exception) {
+            return null;
+        }
+
         $user = static::findByTelegramId($tUser->getId());
         $chatId = null;
 
