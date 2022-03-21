@@ -1,13 +1,16 @@
-version: '3'
+version: '3.8'
 
 services:
   # PHP application container
   lumen:
     container_name: lumen
-    build: container/php
+    build:
+      context: container/php
+      target: ${SERVICE_LUMEN_TARGET:-base}
     image: php:own
     depends_on:
       - mysql
+      - db
       - elastic
     volumes:
       - ./:/app:cached
@@ -23,6 +26,22 @@ services:
       - .env
     volumes:
       - ./container/data/mysql:/var/lib/mysql
+    networks:
+      - app_network
+    ports:
+      - "3306:3308"
+    restart: on-failure
+
+  db:
+    container_name: bot_db
+    image: postgres:14.2-alpine3.15
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./container/data/pgsql/:/var/lib/postgresql/data/pgdata
     networks:
       - app_network
     restart: on-failure
