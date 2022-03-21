@@ -296,7 +296,7 @@ class Bot
                 }
             }
 
-            app()->call([$handler, 'handle'], compact('update'));
+            app()->call([$handler, 'handle'], [$update]);
         } catch (Throwable $throwable) {
             $this->log($throwable->getMessage());
             $handler = new IncorrectMessage($this);
@@ -350,13 +350,13 @@ class Bot
      * @param string      $message
      * @param null|string $level
      */
-    public function log(string $message, string $level = null)
+    public function log(string $message, string $level = null, array $context = [])
     {
         if (is_null($level) || !method_exists($this->logger, $level)) {
             $level = "info";
         }
 
-        $this->logger->{$level}($message);
+        $this->logger->{$level}($message, $context);
     }
 
     /**

@@ -55,7 +55,8 @@ class HelpCommand extends AbstractCommandHandler
         } catch (HttpException $apiException) {
             $this->bot->log(sprintf(
                 "Cannot handle help message answer. \nError: %s", $apiException->getMessage()),
-                "error"
+                "error",
+                ['code' => $apiException->getCode()]
             );
         }
     }
