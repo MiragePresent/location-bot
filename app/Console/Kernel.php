@@ -26,6 +26,7 @@ class Kernel extends ConsoleKernel
         CreateIndexCommand::class,
         DeleteIndexCommand::class,
         Commands\IndexLocationsCommand::class,
+        Commands\PgsqlMigrate::class,
     ];
 
     /**
