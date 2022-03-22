@@ -1,12 +1,10 @@
-version: '3.8'
+version: '3'
 
 services:
   # PHP application container
   lumen:
     container_name: lumen
-    build:
-      context: container/php
-      target: ${SERVICE_LUMEN_TARGET:-base}
+    build: container/php
     image: php:own
     depends_on:
       - mysql
