@@ -296,9 +296,9 @@ class Bot
                 }
             }
 
-            app()->call([$handler, 'handle'], [$update]);
+            app()->call([$handler, 'handle'], ['update' => $update]);
         } catch (Throwable $throwable) {
-            $this->log($throwable->getMessage());
+            $this->log($throwable->getMessage(), 'error');
             $handler = new IncorrectMessage($this);
             $handler->handle($update);
 
@@ -307,7 +307,7 @@ class Bot
                 $throwable->getMessage(),
                 $update->getUpdateId(),
                 $this->isMessage($update) ? $update->getMessage()->getText() : 'NOT_MESSAGE_UPDATE'
-            ));
+            ), 'error');
         }
     }
 
