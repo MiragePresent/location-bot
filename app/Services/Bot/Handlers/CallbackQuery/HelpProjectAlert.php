@@ -27,7 +27,7 @@ class HelpProjectAlert extends AbstractUpdateHandler implements CallbackQueryHan
         return $callbackData === self::CALLBACK_DATA;
     }
 
-    public function handle(Update $update)
+    public function handle(Update $update): void
     {
         $support = $this->getBot()->getSupportInfo();
         $answer = new HelpProjectAnswer($support['channel']['name'], $support['channel']['link']);
