@@ -129,6 +129,10 @@ class User extends Model
      */
     public function saveLocation(float $latitude, float $longitude)
     {
-        $this->locations()->create(compact('latitude', 'longitude'));
+        $this->locations()->create([
+            'latitude'  => $latitude,
+            'longitude' => $longitude,
+            'created_at' => Carbon::now(),
+        ]);
     }
 }
