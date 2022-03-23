@@ -16,20 +16,6 @@ services:
     networks:
       - app_network
 
-  # Database container
-  mysql:
-    container_name: bot_mysql
-    image: mysql:5.7
-    env_file:
-      - .env
-    volumes:
-      - ./container/data/mysql:/var/lib/mysql
-    networks:
-      - app_network
-    ports:
-      - "3306:3308"
-    restart: on-failure
-
   db:
     container_name: bot_db
     image: postgres:14.2-alpine3.15
@@ -42,17 +28,9 @@ services:
       - ./container/data/pgsql/:/var/lib/postgresql/data/pgdata
     networks:
       - app_network
+    ports:
+      - "6432:5432"
     restart: on-failure
-
-  backuper:
-    build: container/backuper
-    container_name: database-backup
-    env_file:
-      - .env
-    volumes:
-      - ./container/data/backup:/opt/mysql/backup
-    command: crond -f -d 8
-    restart: always
 
   # Web Server
   nginx:
@@ -82,9 +60,6 @@ services:
     networks:
       - app_network
     restart: on-failure
-
-volumes:
-  db-data:
 
 networks:
   app_network:
