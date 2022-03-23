@@ -25,6 +25,11 @@ return [
      */
     'patches_file' => database_path('source/church_patches.csv'),
 
+    /**
+     * Search by location in given radius
+     */
+    'search_radius' => 100000, // 100 km in meters
+
     'support' => [
         'channel' => [
             'name' => env('BOT_SUPPORT_CHANNEL_NAME', 'Telegram Support'),
