@@ -8,6 +8,7 @@ use App\Services\Elastic\QueryStringTerm;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Nord\Lumen\Elasticsearch\Contracts\ElasticsearchServiceContract;
 use Nord\Lumen\Elasticsearch\Search\Query\Compound\BoolQuery;
 use Nord\Lumen\Elasticsearch\Search\Query\TermLevel\TermQuery;
@@ -72,6 +73,7 @@ class LocationRepository
     }
 
     /**
+     * @param int   $radius     Search radius in meters
      * @param float $latitude
      * @param float $longitude
      * @param int   $limit
@@ -80,32 +82,31 @@ class LocationRepository
      * @return Collection|Church[]
      */
     public function findNearBy(
+        int $radius,
         float $latitude,
         float $longitude,
         int $limit = self::DEFAULT_LIMIT,
         int $offset = self::DEFAULT_OFFSET
     ): Collection {
-        $distanceSort = new GeoDistanceSort();
-        $distanceSort->setField('location')
-            ->setLocation($latitude, $longitude)
-            ->setUnit(GeoDistanceSort::UNIT_KILOMETER)
-            ->setOrder(GeoDistanceSort::ORDER_ASC);
-        $query = $this->elastic->createSearch()
-            ->setIndex($this->getIndex())
-            ->setSize($limit)
-            ->setFrom($offset)
-            ->setSort(new Sort([$distanceSort]));
-
-        $response = $this->elastic->execute($query);
-        $collection = $this->toCollection($response)->keyBy('id');
-
-        // Add distance to results
-        foreach ($response['hits']['hits'] as $hit) {
-            $model = $collection[$hit['_id']];
-            $model->distance = current($hit['sort']);
-        }
-
-        return $collection->values();
+        return Church::query()
+            ->addSelect([
+                "*",
+                DB::raw("ROUND(earth_distance(ll_to_earth(?,?), ll_to_earth(latitude, longitude))::NUMERIC, 3) AS distance")
+            ])
+            ->where(function ($query) use ($radius, $latitude, $longitude){
+                $query
+                    ->whereRaw("earth_box(ll_to_earth(?,?), ?) @> ll_to_earth(latitude, longitude)")
+                    ->whereRaw("earth_distance(ll_to_earth(?,?), ll_to_earth(latitude, longitude)) < ?");
+            })
+            ->addBinding([
+                $latitude, $longitude,
+                $latitude, $longitude, $radius,
+                $latitude, $longitude, $radius,
+            ])
+            ->orderBy("distance")
+            ->limit($limit)
+            ->offset($offset)
+            ->get();
     }
 
     protected function toCollection(array $response)
