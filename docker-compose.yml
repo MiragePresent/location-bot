@@ -7,7 +7,6 @@ services:
     build: container/php
     image: php:own
     depends_on:
-      - mysql
       - db
       - elastic
     volumes:
