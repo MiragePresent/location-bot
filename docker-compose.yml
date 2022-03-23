@@ -7,7 +7,6 @@ services:
     build: container/php
     image: php:own
     depends_on:
-      - mysql
       - db
       - elastic
     volumes:
@@ -15,20 +14,6 @@ services:
       - ./container/php/php.ini-production:/usr/local/etc/php/conf.d/10-custom.ini
     networks:
       - app_network
-
-  # Database container
-  mysql:
-    container_name: bot_mysql
-    image: mysql:5.7
-    env_file:
-      - .env
-    volumes:
-      - ./container/data/mysql:/var/lib/mysql
-    networks:
-      - app_network
-    ports:
-      - "3306:3308"
-    restart: on-failure
 
   db:
     container_name: bot_db
@@ -42,7 +27,6 @@ services:
       - ./container/data/pgsql/:/var/lib/postgresql/data/pgdata
     networks:
       - app_network
-    ports
     restart: on-failure
 
   backuper:
