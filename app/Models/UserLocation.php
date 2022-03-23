@@ -34,7 +34,7 @@ class UserLocation extends Model
         'user_id',
         'latitude',
         'longitude',
-        'created_at'
+        'created_at',
     ];
 
     protected $dates = [ 'created_at' ];
