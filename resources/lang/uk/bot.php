@@ -51,7 +51,7 @@ return [
             "find_by_location" => "Відправ мені свою геолокацію",
             "find_by_list" => "В якій області ти шукаєш церкву?",
             "specify_a_city" => "Вкажи, будь ласка, населений пункт.",
-            "specify_a_church" => "Яка саме церква тебе цікавить?",
+            "specify_a_church" => "Ось що мені вдалось знайти за запитом ':query'. Яка саме церква тебе цікавить?",
 
             // Church address format
             "church_address" => "*:name* " . emoji("\xE2\x9B\xAA") /* ⛪ */ . PHP_EOL . ":address",

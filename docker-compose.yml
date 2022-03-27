@@ -8,7 +8,6 @@ services:
     image: php:own
     depends_on:
       - db
-      - elastic
     volumes:
       - ./:/app:cached
       - ./container/php/php.ini-production:/usr/local/etc/php/conf.d/10-custom.ini
@@ -29,16 +28,6 @@ services:
       - app_network
     restart: on-failure
 
-  backuper:
-    build: container/backuper
-    container_name: database-backup
-    env_file:
-      - .env
-    volumes:
-      - ./container/data/backup:/opt/mysql/backup
-    command: crond -f -d 8
-    restart: always
-
   # Web Server
   nginx:
     container_name: nginx
@@ -52,21 +41,6 @@ services:
       - lumen
     networks:
       - app_network
-
-  elastic:
-    container_name: elastic
-    build: container/elastic
-    environment:
-      - "node.name=location-bot-master"
-      - "discovery.type=single-node"
-      - "bootstrap.memory_lock=true"
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-    volumes:
-      - ./container/data/elastic:/usr/share/elasticsearch/data
-      - ./container/elastic/config/synonyms:/usr/share/elasticsearch/config/synonyms
-    networks:
-      - app_network
-    restart: on-failure
 
 volumes:
   db-data:

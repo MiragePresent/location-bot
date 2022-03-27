@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ba8499da3c652c590b49ad0c24ed0d43",
+    "content-hash": "b29ae57798834dc4f584f95af5ad11af",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -2462,57 +2462,6 @@
             "time": "2019-08-28T21:21:05+00:00"
         },
         {
-            "name": "league/pipeline",
-            "version": "0.3.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/thephpleague/pipeline.git",
-                "reference": "27dc18166c30d6429c75d1320f41e8238c59c3d4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/pipeline/zipball/27dc18166c30d6429c75d1320f41e8238c59c3d4",
-                "reference": "27dc18166c30d6429c75d1320f41e8238c59c3d4",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5"
-            },
-            "require-dev": {
-                "henrikbjorn/phpspec-code-coverage": "^1.0",
-                "phpspec/phpspec": "^2.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "League\\Pipeline\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Frank de Jonge",
-                    "email": "info@frenky.net"
-                }
-            ],
-            "description": "A plug and play pipeline implementation.",
-            "keywords": [
-                "composition",
-                "design pattern",
-                "pattern",
-                "pipeline",
-                "sequential"
-            ],
-            "support": {
-                "issues": "https://github.com/thephpleague/pipeline/issues",
-                "source": "https://github.com/thephpleague/pipeline/tree/master"
-            },
-            "time": "2016-10-13T20:53:39+00:00"
-        },
-        {
             "name": "monolog/monolog",
             "version": "1.27.0",
             "source": {
@@ -2743,67 +2692,6 @@
                 "source": "https://github.com/nikic/FastRoute/tree/master"
             },
             "time": "2018-02-13T20:26:39+00:00"
-        },
-        {
-            "name": "nordsoftware/lumen-elasticsearch",
-            "version": "3.8.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/digiaonline/lumen-elasticsearch.git",
-                "reference": "b65d256fd0f9fd8494046e986fadf8045f823195"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/digiaonline/lumen-elasticsearch/zipball/b65d256fd0f9fd8494046e986fadf8045f823195",
-                "reference": "b65d256fd0f9fd8494046e986fadf8045f823195",
-                "shasum": ""
-            },
-            "require": {
-                "elasticsearch/elasticsearch": "^5.3",
-                "illuminate/console": "^5.4 | ^6.0",
-                "illuminate/support": "^5.4 | ^6.0",
-                "league/pipeline": "^0.3.0",
-                "php": ">=7.1"
-            },
-            "require-dev": {
-                "pagerfanta/pagerfanta": "^1.0",
-                "phpstan/phpstan": "^0.9.2",
-                "phpunit/phpunit": "^7.5"
-            },
-            "suggest": {
-                "pagerfanta/pagerfanta": "If you intend to use the included Pagerfanta adapter"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Nord\\Lumen\\Elasticsearch\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christoffer Lindqvist",
-                    "email": "christoffer.lindqvist@nordsoftware.com"
-                },
-                {
-                    "name": "Sam Stenvall",
-                    "email": "sam.stenvall@digia.com"
-                }
-            ],
-            "description": "Simple wrapper of https://github.com/elastic/elasticsearch-php for the Lumen PHP framework.",
-            "keywords": [
-                "elasticsearch",
-                "laravel",
-                "lumen"
-            ],
-            "support": {
-                "issues": "https://github.com/digiaonline/lumen-elasticsearch/issues",
-                "source": "https://github.com/digiaonline/lumen-elasticsearch/tree/3.8.2"
-            },
-            "time": "2020-01-15T09:01:12+00:00"
         },
         {
             "name": "nuovo/spreadsheet-reader",
