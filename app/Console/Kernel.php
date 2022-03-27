@@ -6,9 +6,6 @@ use App\Console\Commands;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 
-use Nord\Lumen\Elasticsearch\Console\CreateCommand as CreateIndexCommand;
-use Nord\Lumen\Elasticsearch\Console\DeleteCommand as DeleteIndexCommand;
-
 class Kernel extends ConsoleKernel
 {
     /**
@@ -22,11 +19,6 @@ class Kernel extends ConsoleKernel
         Commands\BotSetWebHookCommand::class,
         Commands\PatchChurchImport::class,
         Commands\PatchChurchGenerate::class,
-
-        CreateIndexCommand::class,
-        DeleteIndexCommand::class,
-        Commands\IndexLocationsCommand::class,
-        Commands\PgsqlMigrate::class,
     ];
 
     /**
