@@ -3,16 +3,9 @@
 namespace App\Repository;
 
 use App\Models\Church;
-use App\Services\Elastic\GeoDistanceSort;
-use App\Services\Elastic\QueryStringTerm;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Nord\Lumen\Elasticsearch\Contracts\ElasticsearchServiceContract;
-use Nord\Lumen\Elasticsearch\Search\Query\Compound\BoolQuery;
-use Nord\Lumen\Elasticsearch\Search\Query\TermLevel\TermQuery;
-use Nord\Lumen\Elasticsearch\Search\Sort;
 
 /**
  * Class LocationRepository
@@ -25,51 +18,30 @@ class LocationRepository
     public const DEFAULT_LIMIT = 10;
     public const DEFAULT_OFFSET = 0;
 
-    /**
-     * Elastic Search Client
-     *
-     * @var ElasticsearchServiceContract
-     */
-    private $elastic;
-
-    public function __construct(ElasticsearchServiceContract $elastic)
-    {
-        $this->elastic = $elastic;
-    }
-
-    /**
-     * Elastic search index
-     *
-     * @return string
-     */
-    protected function getIndex(): string
-    {
-        return 'locations';
-    }
-
-    /**
-     * Eloquent model
-     *
-     * @return string
-     */
-    protected function getModel(): string
-    {
-        return Church::class;
-    }
-
     public function findByText(
         string $text,
         int $limit = self::DEFAULT_LIMIT,
         int $offset = self::DEFAULT_OFFSET
     ): Collection {
-        $query = (new BoolQuery())->addMust(new QueryStringTerm($text));
-        $search = $this->elastic->createSearch()
-            ->setIndex($this->getIndex())
-            ->setSize($limit)
-            ->setFrom($offset)
-            ->setQuery($query);
-
-        return $this->toCollection($this->elastic->execute($search));
+        return Church::query()
+            ->from('churches as ch')
+            ->addSelect([
+                "ch.*",
+                DB::raw("similarity(ch.name, ?) as church_name_score"),
+                DB::raw("similarity(c.name, ?) as city_name_score")
+            ])
+            ->join('cities as c', 'c.id', 'ch.city_id')
+            ->where(function (Builder $query) use ($text) {
+                $query->whereRaw("similarity(ch.name, ?) > .2")
+                    ->orWhereRaw("similarity(c.name, ?) > .2");
+            })
+            ->orderByRaw("c.name <-> ?")
+            ->orderByRaw("ch.name <-> ?")
+            ->orderBy("ch.name")
+            ->offset($offset)
+            ->limit($limit)
+            ->setBindings(array_fill(0, 6, $text))
+            ->get();
     }
 
     /**
@@ -107,23 +79,5 @@ class LocationRepository
             ->limit($limit)
             ->offset($offset)
             ->get();
-    }
-
-    protected function toCollection(array $response)
-    {
-        $results = collect($response['hits']['hits']);
-
-        $keys = $results->pluck('_id')->values()->all();
-        $modelClass = $this->getModel();
-        /** @var Model|Builder $model */
-        $model = new $modelClass();
-
-        $models = $model->whereIn($model->getKeyName(), $keys)
-            ->get()
-            ->keyBy($model->getKeyName());
-
-        return $results->map(function ($hit) use ($models) {
-            return $models[$hit['_id']];
-        });
     }
 }
