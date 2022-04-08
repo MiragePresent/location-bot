@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
         Commands\BotSetWebHookCommand::class,
         Commands\PatchChurchImport::class,
         Commands\PatchChurchGenerate::class,
+        Commands\LocationsFixCommand::class,
     ];
 
     /**
