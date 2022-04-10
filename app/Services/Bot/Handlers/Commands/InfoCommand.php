@@ -42,10 +42,10 @@ class InfoCommand extends AbstractCommandHandler
 
         try {
             $chatId = $message->getChat()->getId();
-//            $support = $this->bot->getSupportInfo();
-//            $channel = $support['channel'];
+            $support = $this->bot->getSupportInfo();
+            $channel = $support['channel'];
 
-            $this->bot->sendTo($chatId, new TextAnswer("This is test info command answer."));
+            $this->bot->sendTo($chatId, new TextAnswer(sprintf("This is test info command answer. channel: %s", json_encode($channel))));
 
 //            $answer = new TextAnswer(trans("bot.messages.text.help", [
 //                "bot_username" => $this->bot->getUsername(),
