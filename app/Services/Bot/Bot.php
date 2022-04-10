@@ -96,9 +96,8 @@ class Bot
      */
     protected $commands = [
         Commands\StartCommand::class,
-        Commands\InfoCommand::class,
+        Commands\HelpCommand::class,
         Commands\FindCommand::class,
-        Commands\InfoCommand::class,
     ];
 
     /**

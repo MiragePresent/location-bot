@@ -46,9 +46,8 @@ class HelpCommand extends AbstractCommandHandler
             $channel = $support['channel'];
 
             $answer = new TextAnswer(trans("bot.messages.text.help", [
-                "bot_username" => $this->bot->getUsername(),
-                'support_channel_name' => $channel['name'],
                 'support_channel_link' => $channel['link'],
+                'support_channel_name' => $channel['name'],
             ]));
 
             $this->bot->sendTo($chatId, $answer);
