@@ -47,13 +47,13 @@ class InfoCommand extends AbstractCommandHandler
 
             $this->bot->sendTo($chatId, new TextAnswer(sprintf("This is test info command answer. channel: %s", json_encode($channel))));
 
-//            $answer = new TextAnswer(trans("bot.messages.text.help", [
-//                "bot_username" => $this->bot->getUsername(),
-//                'support_channel_name' => $channel['name'],
-//                'support_channel_link' => $channel['link'],
-//            ]));
-//
-//            $this->bot->sendTo($chatId, $answer);
+            $answer = new TextAnswer(trans("bot.messages.text.help", [
+                "bot_username" => $this->bot->getUsername(),
+                'support_channel_name' => $channel['name'],
+                'support_channel_link' => $channel['link'],
+            ]));
+
+            $this->bot->sendTo($chatId, $answer);
         } catch (HttpException $apiException) {
             $this->bot->log(sprintf(
                 "Cannot handle info message answer. \nError: %s", $apiException->getMessage()),
