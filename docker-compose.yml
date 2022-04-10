@@ -1,16 +1,16 @@
-version: '3'
+version: '3.8'
 
 services:
   # PHP application container
   lumen:
     container_name: lumen
-    build: container/php
-    image: php:own
+    build:
+      context: container/php
+    image: bot_backend:latest
     depends_on:
       - db
     volumes:
-      - ./:/app:cached
-      - ./container/php/php.ini-production:/usr/local/etc/php/conf.d/10-custom.ini
+      - ./:/app:delegated
     networks:
       - app_network
 

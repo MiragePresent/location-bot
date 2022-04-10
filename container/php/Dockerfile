@@ -1,42 +1,50 @@
-FROM php:7.3-fpm as base
+FROM alpine:3.15.0 as base
 
-# Installing dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libfreetype6-dev \
-    libzip-dev \
-    libpq-dev \
-    locales \
-    zip
+RUN apk --no-cache add \
+    php8 \
+    php8-ctype \
+    php8-curl \
+    php8-fileinfo \
+    php8-iconv \
+    php8-json \
+    php8-mbstring \
+    php8-dom \
+    php8-xml \
+    php8-xmlwriter \
+    php8-pdo \
+    php8-pgsql \
+    php8-pdo_pgsql \
+    php8-openssl \
+    php8-phar \
+    php8-tokenizer \
+    php8-zlib \
+    php8-zip \
+    php8-opcache \
+    php8-fpm \
+    supervisor
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /var/log/supervisor
+RUN mkdir -p /var/run/php/
+RUN mkdir -p /var/run/php8-fpm/
+RUN mkdir -p /var/run/php-fpm8/
+RUN mkdir -p /var/run/php8/
 
-# Installing extensions
-RUN docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath opcache
+ADD php-supervisor.ini /etc/supervisor.d/php-supervisor.ini
 
-# Installing composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN ln -s /usr/bin/php8 /usr/bin/php && \
+    ln -s /usr/sbin/php-fpm8 /usr/sbin/php-fpm
 
-# Configuration for supporting cyrillic fonts in bash
-RUN echo "set meta-flag on" >> /etc/.inputrc \
-    echo "set convert-meta off" >> /etc/.inputrc
+RUN rm -rf /etc/php8/php-fpm.d/
+COPY ./php-fpm.conf /etc/php8/
 
 WORKDIR /app
-RUN chmod -R 775 /app && \
-    chown -R www-data:www-data /app
 
-FROM base as dev
+RUN adduser -D -H -u 1000 -s /bin/bash www-data -G www-data
 
-RUN pecl install xdebug \
-    && docker-php-ext-enable xdebug \
-    && echo "error_reporting = E_ALL" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "display_startup_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "display_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.client_post=9002" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.start_with_request=trigger" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.discover_client_host=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+RUN chown -R www-data:www-data /app
 
-COPY "memory-limit.ini" "/usr/local/etc/php/conf.d/memory-limit.ini"
+EXPOSE 9000
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+CMD ["/usr/bin/supervisord", "-n"]
