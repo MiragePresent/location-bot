@@ -48,6 +48,7 @@ class InfoCommand extends AbstractCommandHandler
             $this->bot->sendTo($chatId, new TextAnswer(sprintf("This is test info command answer. channel: %s", json_encode($channel))));
 
             $answer = new TextAnswer(trans("bot.messages.text.help", [
+                'support_channel_link' => $channel['link'],
                 'support_channel_name' => $channel['name'],
             ]));
 
