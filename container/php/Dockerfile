@@ -12,9 +12,8 @@ RUN apk --no-cache add \
     php8-xml \
     php8-xmlwriter \
     php8-pdo \
-    php8-mysqli \
-    php8-mysqlnd  \
-    php8-pdo_mysql \
+    php8-pgsql \
+    php8-pdo_pgsql \
     php8-openssl \
     php8-phar \
     php8-tokenizer \
