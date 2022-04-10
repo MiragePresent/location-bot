@@ -8,34 +8,25 @@ services:
       context: container/php
     image: bot_backend:latest
     depends_on:
-      - mysql
-      - elastic
+      - db
     volumes:
       - ./:/app:delegated
     networks:
       - app_network
 
-  # Database container
-  mysql:
-    container_name: bot_mysql
-    image: mysql:5.7
-    env_file:
-      - .env
+  db:
+    container_name: bot_db
+    image: postgres:14.2-alpine3.15
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - ./container/data/mysql:/var/lib/mysql
+      - ./container/data/pgsql/:/var/lib/postgresql/data/pgdata
     networks:
       - app_network
     restart: on-failure
-
-  backuper:
-    build: container/backuper
-    container_name: database-backup
-    env_file:
-      - .env
-    volumes:
-      - ./container/data/backup:/opt/mysql/backup
-    command: crond -f -d 8
-    restart: always
 
   # Web Server
   nginx:
@@ -50,21 +41,6 @@ services:
       - lumen
     networks:
       - app_network
-
-  elastic:
-    container_name: elastic
-    build: container/elastic
-    environment:
-      - "node.name=location-bot-master"
-      - "discovery.type=single-node"
-      - "bootstrap.memory_lock=true"
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-    volumes:
-      - ./container/data/elastic:/usr/share/elasticsearch/data
-      - ./container/elastic/config/synonyms:/usr/share/elasticsearch/config/synonyms
-    networks:
-      - app_network
-    restart: on-failure
 
 volumes:
   db-data:

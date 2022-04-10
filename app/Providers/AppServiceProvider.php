@@ -19,7 +19,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(\App\Providers\BotServiceProvider::class);
         $this->app->register(\App\Providers\SdaStorageServiceProvider::class);
         $this->app->register(\Jcf\Geocode\GeocodeServiceProvider::class);
-        $this->app->register(\Nord\Lumen\Elasticsearch\ElasticsearchServiceProvider::class);
 
         $this->app->bind(Repository\LocationRepository::class, Repository\LocationRepository::class);
 

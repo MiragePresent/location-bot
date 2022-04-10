@@ -85,7 +85,7 @@ final class UpdateTree
         } elseif ($update->getInlineQuery() instanceof InlineQuery) {
             $user = $update->getInlineQuery()->getFrom();
         } else {
-            throw new UpdateParseException('Unable to find user object inside the update');
+            throw new UpdateParseException('Unable to find user object inside the update', $update);
         }
 
         return $user;

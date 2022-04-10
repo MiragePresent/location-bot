@@ -8,6 +8,8 @@ return [
      */
     'token' => env('BOT_TOKEN', ''),
 
+    'username_fallback' => env('BOT_USERNAME_FALLBACK', 'sda_church_bot'),
+
     /**
      * SDA objects API url
      */
@@ -22,6 +24,11 @@ return [
      * Patches file location
      */
     'patches_file' => database_path('source/church_patches.csv'),
+
+    /**
+     * Search by location in given radius
+     */
+    'search_radius' => 100000, // 100 km in meters
 
     'support' => [
         'channel' => [

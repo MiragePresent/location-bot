@@ -49,10 +49,8 @@ return [
 
     'channels' => [
         'bot_activity' => [
-            'name' => 'bot_activity',
             'driver' => 'single',
             'path' => storage_path('logs/bot_activity.log'),
-            'level' => 'debug',
         ],
 
         'stack' => [

@@ -51,7 +51,11 @@ class SyncGeography extends Command
         $progress = $this->output->createProgressBar($this->getCountLines());
         $progress->setFormat("%message% \n%current%/%max% [%bar%] %percent%%");
 
-        DB::select("INSERT IGNORE INTO `countries` (`id`, `name`) VALUES (1, 'Україна')");
+        DB::table('countries')
+            ->insertOrIgnore([
+                'id' => 1,
+                'name' => 'Україна',
+            ]);
 
         $handle = fopen($this->sourcePath, "r");
 

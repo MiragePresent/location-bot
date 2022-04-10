@@ -55,12 +55,12 @@ class DefaultTextReplyHandler extends AbstractUpdateHandler implements KeyboardR
                 })->orderBy('name')->get();
 
                 return $churches->count() === 0
-                    ? $repository->findByText($message->getText())->sortBy('name')
+                    ? $repository->findByText($message->getText())
                     : $churches;
             }
         );
 
-        $this->getBot()->log($churches->pluck('name')->implode(',') . ' count ' . $churches->count());
+        $this->getBot()->log("Found churches", 'info', $churches->toArray());
 
         if ($churches->count() === 0) {
             throw new Exception('No locations found.');
@@ -76,7 +76,11 @@ class DefaultTextReplyHandler extends AbstractUpdateHandler implements KeyboardR
         $keyboardOptions = $churches->map(function (Church $church) {
             return [[ "text" => $church->name ]];
         })->values()->toArray();
-        $answer = new SelectOptionAnswer(trans("bot.messages.text.specify_a_church"), $keyboardOptions);
+
+        $answer = new SelectOptionAnswer(
+            trans("bot.messages.text.specify_a_church", ["query" => $message->getText()]),
+            $keyboardOptions
+        );
 
         $this->getBot()->sendTo($chat->getId(), $answer);
     }

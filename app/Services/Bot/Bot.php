@@ -5,27 +5,11 @@ namespace App\Services\Bot;
 use App\Models\Action;
 use App\Models\User;
 use App\Services\Bot\Handlers\Action\IncorrectAddressReport;
-use App\Services\Bot\Handlers\CallbackQuery\CallbackQueryHandlerInterface;
-use App\Services\Bot\Handlers\CallbackQuery\CancelActions;
-use App\Services\Bot\Handlers\CallbackQuery\ConfirmAddressReport;
-use App\Services\Bot\Handlers\CallbackQuery\FindByList;
-use App\Services\Bot\Handlers\CallbackQuery\FindByLocation;
-use App\Services\Bot\Handlers\CallbackQuery\HelpProjectAlert;
-use App\Services\Bot\Handlers\CallbackQuery\MoreFunctions;
-use App\Services\Bot\Handlers\CallbackQuery\RemoveReportButtons;
-use App\Services\Bot\Handlers\CallbackQuery\RollbackAddressReport;
-use App\Services\Bot\Handlers\CallbackQuery\StartAddressReport;
+use App\Services\Bot\Handlers\CallbackQuery;
 use App\Services\Bot\Handlers\CommandHandlerInterface;
-use App\Services\Bot\Handlers\Commands\FindCommand;
-use App\Services\Bot\Handlers\Commands\HelpCommand;
-use App\Services\Bot\Handlers\Commands\StartCommand;
+use App\Services\Bot\Handlers\Commands;
 use App\Services\Bot\Handlers\InlineSearch;
-use App\Services\Bot\Handlers\KeyboardReply\IncorrectMessage;
-use App\Services\Bot\Handlers\KeyboardReply\LocationReply;
-use App\Services\Bot\Handlers\KeyboardReply\KeyboardReplyHandlerInterface;
-use App\Services\Bot\Handlers\KeyboardReply\FindInRegionReply;
-use App\Services\Bot\Handlers\KeyboardReply\ShowAddressReply;
-use App\Services\Bot\Handlers\KeyboardReply\DefaultTextReplyHandler;
+use App\Services\Bot\Handlers\KeyboardReply;
 use App\Services\Bot\Answer\AnswerInterface;
 use App\Services\SdaStorage\StorageClient;
 use Closure;
@@ -111,9 +95,9 @@ class Bot
      * @var array
      */
     protected $commands = [
-        StartCommand::class,
-        HelpCommand::class,
-        FindCommand::class,
+        Commands\StartCommand::class,
+        Commands\HelpCommand::class,
+        Commands\FindCommand::class,
     ];
 
     /**
@@ -122,10 +106,10 @@ class Bot
      * @var array
      */
     protected $replyHandlers = [
-        LocationReply::class,
-        FindInRegionReply::class,
-        ShowAddressReply::class,
-        DefaultTextReplyHandler::class,
+        KeyboardReply\LocationReply::class,
+        KeyboardReply\FindInRegionReply::class,
+        KeyboardReply\ShowAddressReply::class,
+        KeyboardReply\DefaultTextReplyHandler::class,
     ];
 
     /**
@@ -134,15 +118,15 @@ class Bot
      * @var array
      */
     protected $callbackQueries = [
-        FindByList::class,
-        FindByLocation::class,
-        MoreFunctions::class,
-        HelpProjectAlert::class,
-        RemoveReportButtons::class,
-        StartAddressReport::class,
-        RollbackAddressReport::class,
-        ConfirmAddressReport::class,
-        CancelActions::class,
+        CallbackQuery\FindByList::class,
+        CallbackQuery\FindByLocation::class,
+        CallbackQuery\MoreFunctions::class,
+        CallbackQuery\HelpProjectAlert::class,
+        CallbackQuery\RemoveReportButtons::class,
+        CallbackQuery\StartAddressReport::class,
+        CallbackQuery\RollbackAddressReport::class,
+        CallbackQuery\ConfirmAddressReport::class,
+        CallbackQuery\CancelActions::class,
     ];
 
     /**
@@ -216,7 +200,9 @@ class Bot
      */
     public function getUsername(): string
     {
-        return str_replace("_", "\_", $this->getApi()->getMe()->getUsername());
+        $botUsername = $this->getApi()->getMe()->getUsername() ?: config('bot.username_fallback');
+
+        return str_replace("_", "\_", $botUsername);
     }
 
     /**
@@ -232,6 +218,12 @@ class Bot
 
         $this->user = User::getByUpdate($update);
 
+        if (is_null($this->user)) {
+            $this->log('Update cannot be processed. User was not detected', 'warning');
+
+            return;
+        }
+
         try {
             if ($this->isCommand($update)) {
                 $this->setTyping($update);
@@ -242,7 +234,7 @@ class Bot
                 $handler = new InlineSearch($this);
             } elseif ($this->isCallbackQuery($update)) {
                 foreach ($this->callbackQueries as $handlerClass) {
-                    /** @var CallbackQueryHandlerInterface $handlerClass */
+                    /** @var CallbackQuery\CallbackQueryHandlerInterface $handlerClass */
                     if ($handlerClass::isSuitable($update->getCallbackQuery()->getData())) {
                         $handler = new $handlerClass($this);
 
@@ -279,7 +271,7 @@ class Bot
                 }
 
                 foreach ($this->replyHandlers as $handlerClass) {
-                    /** @var KeyboardReplyHandlerInterface $handlerClass */
+                    /** @var KeyboardReply\KeyboardReplyHandlerInterface $handlerClass */
                     if ($handlerClass::isSuitable($update->getMessage())) {
                         $handler = new $handlerClass($this);
 
@@ -288,10 +280,10 @@ class Bot
                 }
             }
 
-            app()->call([$handler, 'handle'], compact('update'));
+            app()->call([$handler, 'handle'], ['update' => $update]);
         } catch (Throwable $throwable) {
-            $this->log($throwable->getMessage());
-            $handler = new IncorrectMessage($this);
+            $this->log($throwable->getMessage(), 'error');
+            $handler = new KeyboardReply\IncorrectMessage($this);
             $handler->handle($update);
 
             $this->log(sprintf(
@@ -299,7 +291,7 @@ class Bot
                 $throwable->getMessage(),
                 $update->getUpdateId(),
                 $this->isMessage($update) ? $update->getMessage()->getText() : 'NOT_MESSAGE_UPDATE'
-            ));
+            ), 'error');
         }
     }
 
@@ -342,13 +334,13 @@ class Bot
      * @param string      $message
      * @param null|string $level
      */
-    public function log(string $message, string $level = null)
+    public function log(string $message, string $level = null, array $context = [])
     {
         if (is_null($level) || !method_exists($this->logger, $level)) {
             $level = "info";
         }
 
-        $this->logger->{$level}($message);
+        $this->logger->{$level}($message, $context);
     }
 
     /**
