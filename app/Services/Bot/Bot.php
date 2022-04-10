@@ -5,27 +5,11 @@ namespace App\Services\Bot;
 use App\Models\Action;
 use App\Models\User;
 use App\Services\Bot\Handlers\Action\IncorrectAddressReport;
-use App\Services\Bot\Handlers\CallbackQuery\CallbackQueryHandlerInterface;
-use App\Services\Bot\Handlers\CallbackQuery\CancelActions;
-use App\Services\Bot\Handlers\CallbackQuery\ConfirmAddressReport;
-use App\Services\Bot\Handlers\CallbackQuery\FindByList;
-use App\Services\Bot\Handlers\CallbackQuery\FindByLocation;
-use App\Services\Bot\Handlers\CallbackQuery\HelpProjectAlert;
-use App\Services\Bot\Handlers\CallbackQuery\MoreFunctions;
-use App\Services\Bot\Handlers\CallbackQuery\RemoveReportButtons;
-use App\Services\Bot\Handlers\CallbackQuery\RollbackAddressReport;
-use App\Services\Bot\Handlers\CallbackQuery\StartAddressReport;
+use App\Services\Bot\Handlers\CallbackQuery;
 use App\Services\Bot\Handlers\CommandHandlerInterface;
-use App\Services\Bot\Handlers\Commands\FindCommand;
-use App\Services\Bot\Handlers\Commands\HelpCommand;
-use App\Services\Bot\Handlers\Commands\StartCommand;
+use App\Services\Bot\Handlers\Commands;
 use App\Services\Bot\Handlers\InlineSearch;
-use App\Services\Bot\Handlers\KeyboardReply\IncorrectMessage;
-use App\Services\Bot\Handlers\KeyboardReply\LocationReply;
-use App\Services\Bot\Handlers\KeyboardReply\KeyboardReplyHandlerInterface;
-use App\Services\Bot\Handlers\KeyboardReply\FindInRegionReply;
-use App\Services\Bot\Handlers\KeyboardReply\ShowAddressReply;
-use App\Services\Bot\Handlers\KeyboardReply\DefaultTextReplyHandler;
+use App\Services\Bot\Handlers\KeyboardReply;
 use App\Services\Bot\Answer\AnswerInterface;
 use App\Services\SdaStorage\StorageClient;
 use Closure;
@@ -111,9 +95,10 @@ class Bot
      * @var array
      */
     protected $commands = [
-        StartCommand::class,
-        HelpCommand::class,
-        FindCommand::class,
+        Commands\StartCommand::class,
+        Commands\InfoCommand::class,
+        Commands\FindCommand::class,
+        Commands\InfoCommand::class,
     ];
 
     /**
@@ -122,10 +107,10 @@ class Bot
      * @var array
      */
     protected $replyHandlers = [
-        LocationReply::class,
-        FindInRegionReply::class,
-        ShowAddressReply::class,
-        DefaultTextReplyHandler::class,
+        KeyboardReply\LocationReply::class,
+        KeyboardReply\FindInRegionReply::class,
+        KeyboardReply\ShowAddressReply::class,
+        KeyboardReply\DefaultTextReplyHandler::class,
     ];
 
     /**
@@ -134,15 +119,15 @@ class Bot
      * @var array
      */
     protected $callbackQueries = [
-        FindByList::class,
-        FindByLocation::class,
-        MoreFunctions::class,
-        HelpProjectAlert::class,
-        RemoveReportButtons::class,
-        StartAddressReport::class,
-        RollbackAddressReport::class,
-        ConfirmAddressReport::class,
-        CancelActions::class,
+        CallbackQuery\FindByList::class,
+        CallbackQuery\FindByLocation::class,
+        CallbackQuery\MoreFunctions::class,
+        CallbackQuery\HelpProjectAlert::class,
+        CallbackQuery\RemoveReportButtons::class,
+        CallbackQuery\StartAddressReport::class,
+        CallbackQuery\RollbackAddressReport::class,
+        CallbackQuery\ConfirmAddressReport::class,
+        CallbackQuery\CancelActions::class,
     ];
 
     /**
@@ -250,7 +235,7 @@ class Bot
                 $handler = new InlineSearch($this);
             } elseif ($this->isCallbackQuery($update)) {
                 foreach ($this->callbackQueries as $handlerClass) {
-                    /** @var CallbackQueryHandlerInterface $handlerClass */
+                    /** @var CallbackQuery\CallbackQueryHandlerInterface $handlerClass */
                     if ($handlerClass::isSuitable($update->getCallbackQuery()->getData())) {
                         $handler = new $handlerClass($this);
 
@@ -287,7 +272,7 @@ class Bot
                 }
 
                 foreach ($this->replyHandlers as $handlerClass) {
-                    /** @var KeyboardReplyHandlerInterface $handlerClass */
+                    /** @var KeyboardReply\KeyboardReplyHandlerInterface $handlerClass */
                     if ($handlerClass::isSuitable($update->getMessage())) {
                         $handler = new $handlerClass($this);
 
@@ -299,7 +284,7 @@ class Bot
             app()->call([$handler, 'handle'], ['update' => $update]);
         } catch (Throwable $throwable) {
             $this->log($throwable->getMessage(), 'error');
-            $handler = new IncorrectMessage($this);
+            $handler = new KeyboardReply\IncorrectMessage($this);
             $handler->handle($update);
 
             $this->log(sprintf(
