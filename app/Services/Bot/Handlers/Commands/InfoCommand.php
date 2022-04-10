@@ -56,6 +56,8 @@ class InfoCommand extends AbstractCommandHandler
                 "error",
                 ['code' => $apiException->getCode()]
             );
+
+            throw $apiException;
         }
     }
 }
