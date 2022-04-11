@@ -5,6 +5,7 @@ namespace App\Services\Bot\Handlers\CallbackQuery;
 use App\Services\Bot\Answer\HelpProjectAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use App\Services\Bot\Tool\UpdateTree;
+use App\Services\Bot\Tracker\StatsTrackerInterface;
 use TelegramBot\Api\Types\Update;
 
 /**
@@ -29,6 +30,8 @@ class HelpProjectAlert extends AbstractUpdateHandler implements CallbackQueryHan
 
     public function handle(Update $update): void
     {
+        $this->bot->getStatsTracker()->setRequestType(StatsTrackerInterface::REQUEST_TYPE_INTERFACE_INTERACTION);
+
         $support = $this->getBot()->getSupportInfo();
         $answer = new HelpProjectAnswer($support['channel']['name'], $support['channel']['link']);
 

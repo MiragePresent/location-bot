@@ -4,6 +4,7 @@ namespace App\Services\Bot\Handlers\Commands;
 
 use App\Services\Bot\Handlers\AbstractCommandHandler;
 use App\Services\Bot\Answer\TextAnswer;
+use App\Services\Bot\Tracker\StatsTrackerInterface;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
 use TelegramBot\Api\Types\Message;
@@ -39,6 +40,8 @@ class StartCommand extends AbstractCommandHandler
      */
     public function handle(Message $message): void
     {
+        $this->bot->getStatsTracker()->setRequestType(StatsTrackerInterface::REQUEST_TYPE_SERVICE_MESSAGE);
+
         $this->bot->log(sprintf(
             "Running start command by: %s",
             $message->getFrom()->toJson()

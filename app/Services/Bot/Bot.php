@@ -4,13 +4,14 @@ namespace App\Services\Bot;
 
 use App\Models\Action;
 use App\Models\User;
+use App\Services\Bot\Answer\AnswerInterface;
 use App\Services\Bot\Handlers\Action\IncorrectAddressReport;
 use App\Services\Bot\Handlers\CallbackQuery;
 use App\Services\Bot\Handlers\CommandHandlerInterface;
 use App\Services\Bot\Handlers\Commands;
 use App\Services\Bot\Handlers\InlineSearch;
 use App\Services\Bot\Handlers\KeyboardReply;
-use App\Services\Bot\Answer\AnswerInterface;
+use App\Services\Bot\Tracker\StatsTrackerInterface;
 use App\Services\SdaStorage\StorageClient;
 use Closure;
 use Psr\Log\LoggerInterface;
@@ -76,6 +77,11 @@ class Bot
     protected $storage;
 
     /**
+     * @var StatsTrackerInterface
+     */
+    protected StatsTrackerInterface $statsTracker;
+
+    /**
      * Logger
      *
      * @var LoggerInterface
@@ -98,6 +104,7 @@ class Bot
         Commands\StartCommand::class,
         Commands\HelpCommand::class,
         Commands\FindCommand::class,
+        Commands\StatsCommand::class,
     ];
 
     /**
@@ -141,12 +148,15 @@ class Bot
         Client $client,
         BotApi $api,
         StorageClient $storage,
+        StatsTrackerInterface $statsTracker,
         LoggerInterface $logger
     ) {
         $this->client = $client;
         $this->api = $api;
         $this->logger = $logger;
         $this->storage = $storage;
+
+        $this->statsTracker = $statsTracker;
 
         $this->registerCommands();
     }
@@ -191,6 +201,11 @@ class Bot
         return $this->user;
     }
 
+    public function getStatsTracker(): StatsTrackerInterface
+    {
+        return $this->statsTracker;
+    }
+
     /**
      * Returns bot username
      *
@@ -217,9 +232,13 @@ class Bot
         $handler = null;
 
         $this->user = User::getByUpdate($update);
+        $this->statsTracker->start($this->user);
 
         if (is_null($this->user)) {
-            $this->log('Update cannot be processed. User was not detected', 'warning');
+            $this->log('Update cannot be processed. User was not detected', 'error');
+
+            $this->statsTracker->setRequestType(StatsTrackerInterface::REQUEST_STATUS_ERROR);
+            $this->statsTracker->finish();
 
             return;
         }
@@ -228,6 +247,8 @@ class Bot
             if ($this->isCommand($update)) {
                 $this->setTyping($update);
                 $this->closeActions();
+
+                $this->statsTracker->finish();
 
                 return;
             } elseif ($this->isInlineQuery($update)) {
@@ -281,7 +302,9 @@ class Bot
             }
 
             app()->call([$handler, 'handle'], ['update' => $update]);
+            $this->statsTracker->setRequestStatus(StatsTrackerInterface::REQUEST_STATUS_OK);
         } catch (Throwable $throwable) {
+            $this->statsTracker->setRequestStatus(StatsTrackerInterface::REQUEST_STATUS_ERROR);
             $this->log($throwable->getMessage(), 'error');
             $handler = new KeyboardReply\IncorrectMessage($this);
             $handler->handle($update);
@@ -293,6 +316,8 @@ class Bot
                 $this->isMessage($update) ? $update->getMessage()->getText() : 'NOT_MESSAGE_UPDATE'
             ), 'error');
         }
+
+        $this->getStatsTracker()->finish();
     }
 
     /**
@@ -306,16 +331,28 @@ class Bot
      */
     public function sendTo($to, AnswerInterface $message)
     {
-        $chatId = $to instanceof Message ? $to->getChat()->getId() : $to;
+        try {
+            $chatId = $to instanceof Message ? $to->getChat()->getId() : $to;
 
-        $this->getApi()->sendMessage(
-            $chatId,
-            $message->getText(),
-            self::PARSE_FORMAT_MARKDOWN,
-            false,
-            null,
-            $message->getMarkup()
-        );
+            $this->getApi()->sendMessage(
+                $chatId,
+                $message->getText(),
+                self::PARSE_FORMAT_MARKDOWN,
+                false,
+                null,
+                $message->getMarkup()
+            );
+            $this->statsTracker->increaseSentMessages();
+        } catch (\Exception $e) {
+            $this->logger->warning(sprintf(
+                "Cannot send message to chat #%s.\nError:%s.\nContext: %s",
+                $chatId,
+                $e->getMessage(),
+                json_encode(['text' => $message->getText(), 'markup' => $message->getMarkup()]),
+            ));
+
+            $this->statsTracker->increaseFailures();
+        }
     }
 
     /**

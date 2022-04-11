@@ -5,6 +5,7 @@ namespace App\Services\Bot\Handlers\CallbackQuery;
 use App\Models\Action;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use App\Services\Bot\Handlers\Action\IncorrectAddressReport;
+use App\Services\Bot\Tracker\StatsTrackerInterface;
 use TelegramBot\Api\Types\Update;
 
 /**
@@ -37,6 +38,8 @@ class RollbackAddressReport extends AbstractUpdateHandler implements CallbackQue
 
     public function handle(Update $update): void
     {
+        $this->bot->getStatsTracker()->setRequestType(StatsTrackerInterface::REQUEST_TYPE_INTERFACE_INTERACTION);
+
         /** @var Action $action */
         $action = Action::whereUserId($this->bot->getUser()->id)
             ->whereKey(IncorrectAddressReport::ACTION_KEY)

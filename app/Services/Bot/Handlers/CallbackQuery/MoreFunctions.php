@@ -3,6 +3,7 @@
 namespace App\Services\Bot\Handlers\CallbackQuery;
 
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
+use App\Services\Bot\Tracker\StatsTrackerInterface;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 use TelegramBot\Api\Types\Update;
 
@@ -41,6 +42,8 @@ class MoreFunctions extends AbstractUpdateHandler implements CallbackQueryHandle
 
     public function handle(Update $update): void
     {
+        $this->bot->getStatsTracker()->setRequestType(StatsTrackerInterface::REQUEST_TYPE_INTERFACE_INTERACTION);
+
         $objectId = $this->getObjectId($update->getCallbackQuery()->getData());
 
         $buttons[] = [[
