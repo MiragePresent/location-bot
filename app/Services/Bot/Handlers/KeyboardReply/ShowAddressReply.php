@@ -5,6 +5,7 @@ namespace App\Services\Bot\Handlers\KeyboardReply;
 use App\Models\Church;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use App\Services\Bot\Answer\AddressAnswer;
+use App\Services\Bot\Tracker\StatsTrackerInterface;
 use App\Services\SdaStorage\DataType\ObjectData;
 use Illuminate\Support\Facades\Cache;
 use TelegramBot\Api\Types\Message;
@@ -40,6 +41,8 @@ class ShowAddressReply extends AbstractUpdateHandler implements KeyboardReplyHan
      */
     public function handle(Update $update): void
     {
+        $this->bot->getStatsTracker()->setRequestType(StatsTrackerInterface::REQUEST_TYPE_ADDRESS);
+
         $this->bot->log(sprintf(
             "Show address: %s \nFor: %s",
             $update->getMessage()->getText(),

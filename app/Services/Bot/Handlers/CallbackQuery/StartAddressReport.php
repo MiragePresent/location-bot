@@ -7,6 +7,7 @@ use App\Services\Bot\Answer\AddressMarkupFactory;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use App\Services\Bot\Handlers\Action\IncorrectAddressReport;
 use App\Services\Bot\Tool\UpdateTree;
+use App\Services\Bot\Tracker\StatsTrackerInterface;
 use App\Services\SdaStorage\DataType\ObjectData;
 use TelegramBot\Api\Types\Update;
 
@@ -45,6 +46,8 @@ class StartAddressReport extends AbstractUpdateHandler implements CallbackQueryH
 
     public function handle(Update $update): void
     {
+        $this->bot->getStatsTracker()->setRequestType(StatsTrackerInterface::REQUEST_TYPE_INTERFACE_INTERACTION);
+
         $objectId = $this->getObjectId($update->getCallbackQuery()->getData());
         $object = $this->getObject($objectId);
 

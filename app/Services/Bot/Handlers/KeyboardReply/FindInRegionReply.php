@@ -6,6 +6,7 @@ use App\Models\City;
 use App\Models\Region;
 use App\Services\Bot\Answer\SelectOptionAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
+use App\Services\Bot\Tracker\StatsTrackerInterface;
 use Illuminate\Support\Facades\Cache;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
@@ -40,6 +41,8 @@ class FindInRegionReply extends AbstractUpdateHandler implements KeyboardReplyHa
      */
     public function handle(Update $update): void
     {
+        $this->bot->getStatsTracker()->setRequestType(StatsTrackerInterface::REQUEST_TYPE_INTERFACE_INTERACTION);
+
         $this->bot->log(sprintf(
             "Search in region: %s \nFor: %s",
             $update->getMessage()->getText(),

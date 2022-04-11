@@ -9,6 +9,7 @@ use App\Services\Bot\Answer\NoResultsByLocationAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use App\Services\Bot\Answer\AddressAnswer;
 use App\Services\Bot\Tool\UpdateTree;
+use App\Services\Bot\Tracker\StatsTrackerInterface;
 use TelegramBot\Api\Types\Message;
 use TelegramBot\Api\Types\Update;
 
@@ -33,6 +34,8 @@ class LocationReply extends AbstractUpdateHandler implements KeyboardReplyHandle
      */
     public function handle(Update $update, LocationRepository $repository): void
     {
+        $this->bot->getStatsTracker()->setRequestType(StatsTrackerInterface::REQUEST_TYPE_ADDRESS);
+
         $searchRadius = config('bot.search_radius');
 
         // Log message

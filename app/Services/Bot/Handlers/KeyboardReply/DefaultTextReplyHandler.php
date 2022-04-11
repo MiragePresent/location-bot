@@ -7,6 +7,7 @@ use App\Repository\LocationRepository;
 use App\Services\Bot\Answer\SelectOptionAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use App\Services\Bot\Tool\UpdateTree;
+use App\Services\Bot\Tracker\StatsTrackerInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -35,6 +36,8 @@ class DefaultTextReplyHandler extends AbstractUpdateHandler implements KeyboardR
      */
     public function handle(Update $update, LocationRepository $repository): void
     {
+        $this->bot->getStatsTracker()->setRequestType(StatsTrackerInterface::REQUEST_TYPE_FREE_TEXT);
+
         $this->bot->log(sprintf(
             "Show addresses in city: %s \nFor: %s",
             $update->getMessage()->getText(),

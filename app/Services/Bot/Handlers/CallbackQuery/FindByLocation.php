@@ -4,6 +4,7 @@ namespace App\Services\Bot\Handlers\CallbackQuery;
 
 use App\Services\Bot\Answer\FindByLocationAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
+use App\Services\Bot\Tracker\StatsTrackerInterface;
 use TelegramBot\Api\Types\Update;
 
 /**
@@ -42,6 +43,8 @@ class FindByLocation extends AbstractUpdateHandler implements CallbackQueryHandl
      */
     public function handle(Update $update): void
     {
+        $this->bot->getStatsTracker()->setRequestType(StatsTrackerInterface::REQUEST_TYPE_FIND_BY_LOCATION);
+
         $this->bot->sendTo(
             $update->getCallbackQuery()->getMessage()->getChat()->getId(),
             new FindByLocationAnswer()

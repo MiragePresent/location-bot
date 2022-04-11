@@ -5,6 +5,7 @@ namespace App\Services\Bot\Handlers\CallbackQuery;
 use App\Models\Region;
 use App\Services\Bot\Answer\SelectOptionAnswer;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
+use App\Services\Bot\Tracker\StatsTrackerInterface;
 use Illuminate\Support\Facades\Cache;
 use TelegramBot\Api\Types\Update;
 
@@ -44,6 +45,8 @@ class FindByList extends AbstractUpdateHandler implements CallbackQueryHandlerIn
      */
     public function handle(Update $update): void
     {
+        $this->bot->getStatsTracker()->setRequestType(StatsTrackerInterface::REQUEST_TYPE_FIND_BY_LIST);
+
         $this->bot->log(
             sprintf(
                 "CallbackQuery: %s \nFrom: %s",
