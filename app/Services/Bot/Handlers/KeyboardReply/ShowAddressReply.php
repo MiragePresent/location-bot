@@ -58,14 +58,7 @@ class ShowAddressReply extends AbstractUpdateHandler implements KeyboardReplyHan
             }
         );
 
-        /** @var ObjectData $object */
-        $object = Cache::remember(
-            "church_object_{$church->id}",
-            Church::CACHE_LIFE_TIME,
-            function () use ($church) {
-                return $this->bot->getStorage()->getObject($church->object_id);
-            });
-        $answer = new AddressAnswer($object);
+        $answer = new AddressAnswer($church);
 
         $this->bot->sendTo($update->getMessage()->getChat()->getId(), $answer);
     }

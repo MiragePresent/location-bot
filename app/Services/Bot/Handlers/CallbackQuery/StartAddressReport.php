@@ -3,6 +3,7 @@
 namespace App\Services\Bot\Handlers\CallbackQuery;
 
 use App\Models\Action;
+use App\Models\Church;
 use App\Services\Bot\Answer\AddressMarkupFactory;
 use App\Services\Bot\Handlers\AbstractUpdateHandler;
 use App\Services\Bot\Handlers\Action\IncorrectAddressReport;
@@ -83,10 +84,21 @@ class StartAddressReport extends AbstractUpdateHandler implements CallbackQueryH
      */
     private function restoreAddressMarkup(Update $update, ObjectData $object): void
     {
+        $objectId = $object->getId();
+
+        /** @var Church $church */
+        $church = Church::query()->where('object_id', $objectId)->first();
+
+        if (!$church) {
+            $this->getBot()->log("Cannot find church by object_id", "error", ["object_id" => $objectId]);
+
+            return;
+        }
+
         $this->bot->getApi()->editMessageReplyMarkup(
             UpdateTree::getChat($update)->getId(),
             UpdateTree::getMessage($update)->getMessageId(),
-            AddressMarkupFactory::create($object)
+            AddressMarkupFactory::create($church)
         );
     }
 }

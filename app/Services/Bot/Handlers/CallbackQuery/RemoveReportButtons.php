@@ -2,6 +2,7 @@
 
 namespace App\Services\Bot\Handlers\CallbackQuery;
 
+use App\Models\Church;
 use App\Services\Bot\Answer\AddressMarkupFactory;
 use App\Services\Bot\Tracker\StatsTrackerInterface;
 use App\Services\SdaStorage\DataType\ObjectData;
@@ -61,10 +62,19 @@ class RemoveReportButtons extends AbstractUpdateHandler implements CallbackQuery
         $message = $update->getCallbackQuery()->getMessage();
         $chatId = $message->getChat()->getId();
 
+        /** @var Church $church */
+        $church = Church::query()->where('object_id', $objectId)->first();
+
+        if (!$church) {
+            $this->getBot()->log("Cannot find church by object_id", "error", ["object_id" => $objectId]);
+
+            return;
+        }
+
         $this->bot->getApi()->editMessageReplyMarkup(
             $chatId,
             $message->getMessageId(),
-            AddressMarkupFactory::create($object)
+            AddressMarkupFactory::create($church)
         );
     }
 }

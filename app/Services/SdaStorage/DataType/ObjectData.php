@@ -165,6 +165,11 @@ class ObjectData extends AbstractDataType
         'address_en' => 'addressEn',
     ];
 
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
     /**
      * Returns default name
      *

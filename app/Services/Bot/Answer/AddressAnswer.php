@@ -2,6 +2,7 @@
 
 namespace App\Services\Bot\Answer;
 
+use App\Models\Church;
 use App\Services\SdaStorage\DataType\ObjectData;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 
@@ -13,40 +14,16 @@ use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
  */
 class AddressAnswer implements AnswerInterface
 {
-    /**
-     * Object data
-     *
-     * @var ObjectData
-     */
-    protected $object;
-
-    /**
-     * Distance to the church
-     *
-     * @var float|null
-     */
-    protected $distance = null;
-
-    public function __construct(ObjectData $objectData, float $distance = null)
-    {
-        $this->object = $objectData;
-        $this->distance = $distance;
-    }
+    public function __construct(protected Church $church) {}
 
     /**
      * @inheritDoc
      */
     public function getText(): string
     {
-        $name = $this->object->getName();
-
-        if (!is_null($this->distance) && round($this->distance, 2) > 0 ) {
-            $name .= sprintf(" (%01.2f км.)", $this->distance);
-        }
-
         return trans("bot.messages.text.church_address", [
-            'name' => $name,
-            'address' => $this->object->getAddress(),
+            'name' => $this->church->name,
+            'address' => $this->church->address,
         ]);
     }
 
@@ -57,6 +34,6 @@ class AddressAnswer implements AnswerInterface
      */
     public function getMarkup()
     {
-        return AddressMarkupFactory::create($this->object);
+        return AddressMarkupFactory::create($this->church);
     }
 }
