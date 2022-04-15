@@ -40,7 +40,7 @@ class LocationsFixCommand extends Command
             return 1;
         }
 
-        if (!empty(array_diff($header, ['object_id', 'name', 'latitude', 'longitude', 'address']))) {
+        if (!empty(array_diff($header, ['object_id', 'name', 'latitude', 'longitude', 'address', 'facebook_url']))) {
             $this->error('Cannot fix locations. Unknown CSV file format');
 
             return 1;
@@ -70,6 +70,10 @@ class LocationsFixCommand extends Command
 
                 if ($row['address']) {
                     $church->address = $row['address'];
+                }
+
+                if ($row['facebook_url']) {
+                    $church->facebook_url = $row['facebook_url'];
                 }
 
                 $church->save();
