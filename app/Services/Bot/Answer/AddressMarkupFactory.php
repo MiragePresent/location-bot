@@ -30,13 +30,13 @@ class AddressMarkupFactory
                 urlencode($church->address)
             )
         ]];
-//
-//        if ($object->facebook) {
-//            $buttons[] = [[
-//                'text' => trans('bot.interface.button.facebook'),
-//                'url' => $object->facebook,
-//            ]];
-//        }
+
+        if ($church->facebook_url) {
+            $buttons[] = [[
+                'text' => trans('bot.interface.button.facebook'),
+                'url' => $church->facebook_url,
+            ]];
+        }
 
 //        $buttons[] = [[
 //            "text" => trans("bot.interface.button.more"),
