@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string    $address
  * @property float     $latitude
  * @property float     $longitude
+ * @property string    $facebook_url
  *
  * @property-read City $city
  * @property-read ChurchPatch[]|null $patches Address and location patches
