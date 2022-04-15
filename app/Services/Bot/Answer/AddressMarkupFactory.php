@@ -21,20 +21,22 @@ class AddressMarkupFactory
      *
      * @return InlineKeyboardMarkup
      */
-    public static function create(Church $church)
+    public static function create(Church $church, ObjectData $object = null)
     {
         $buttons[] = [[
             'text' => trans('bot.interface.button.show_on_the_map'),
             'url' => sprintf(
                 "https://maps.google.com/maps?q=%s",
-                urlencode($church->address)
-            )
+                    urlencode($church->address)
+                )
         ]];
 
-        if ($church->facebook_url) {
+        $facebookUrl = $church->facebook_url ?: $object?->facebook;
+
+        if ($facebookUrl) {
             $buttons[] = [[
                 'text' => trans('bot.interface.button.facebook'),
-                'url' => $church->facebook_url,
+                'url' => $facebookUrl,
             ]];
         }
 

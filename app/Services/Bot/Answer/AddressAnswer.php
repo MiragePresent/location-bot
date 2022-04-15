@@ -14,7 +14,7 @@ use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
  */
 class AddressAnswer implements AnswerInterface
 {
-    public function __construct(protected Church $church) {}
+    public function __construct(protected Church $church, protected ?ObjectData $object = null) {}
 
     /**
      * @inheritDoc
@@ -34,6 +34,6 @@ class AddressAnswer implements AnswerInterface
      */
     public function getMarkup()
     {
-        return AddressMarkupFactory::create($this->church);
+        return AddressMarkupFactory::create($this->church, $this->object);
     }
 }

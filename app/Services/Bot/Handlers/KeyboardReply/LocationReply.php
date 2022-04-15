@@ -57,7 +57,7 @@ class LocationReply extends AbstractUpdateHandler implements KeyboardReplyHandle
 
                 $this->bot->sendTo(
                     $update->getMessage()->getChat()->getId(),
-                    new AddressAnswer($object)
+                    new AddressAnswer($church, $object)
                 );
             });
     }
