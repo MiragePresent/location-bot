@@ -14,6 +14,7 @@ use App\Services\Bot\Handlers\KeyboardReply;
 use App\Services\Bot\Tracker\StatsTrackerInterface;
 use App\Services\SdaStorage\StorageClient;
 use Closure;
+use Prophecy\Call\Call;
 use Psr\Log\LoggerInterface;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Client;
@@ -134,6 +135,7 @@ class Bot
         CallbackQuery\RollbackAddressReport::class,
         CallbackQuery\ConfirmAddressReport::class,
         CallbackQuery\CancelActions::class,
+        CallbackQuery\GetHumanitarianHelp::class,
     ];
 
     /**
