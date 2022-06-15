@@ -56,4 +56,11 @@ class DBStatsRepository implements StatsRepositoryInterface
     {
         return [];
     }
+
+    public function numberOfHumanitarianHelpRequests(): int
+    {
+        return Statistics::query()
+            ->where('request_type', StatsTrackerInterface::REQUEST_HUMANITARIAN_HELP)
+            ->count();
+    }
 }
