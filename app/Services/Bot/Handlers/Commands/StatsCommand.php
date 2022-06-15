@@ -43,11 +43,13 @@ class StatsCommand extends AbstractCommandHandler
             "Number of users: %d\n" .
             "Requests number (_since 11.04.2022_): %d\n" .
             "Number of churches found: %d\n" .
-            "Errors: %d\n",
+            "Errors: %d\n\n" .
+            "Humanitarian help requests (_since 15.06.2022_): %d\n",
             $statsRepository->numberOfUsers(),
             $statsRepository->numberOfAllRequests(),
             $statsRepository->numberOfAddressesFound(),
             $statsRepository->numberOfErrors(),
+            $statsRepository->numberOfHumanitarianHelpRequests(),
         ));
 
         $this->bot->sendTo($chatId, $generalStats);

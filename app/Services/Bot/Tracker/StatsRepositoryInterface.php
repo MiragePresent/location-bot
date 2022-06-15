@@ -13,4 +13,5 @@ interface StatsRepositoryInterface
     public function numberOfAddressesFound(): int;
     public function numberOfErrors(): int;
     public function getRequestsDetails(): array;
+    public function numberOfHumanitarianHelpRequests(): int;
 }

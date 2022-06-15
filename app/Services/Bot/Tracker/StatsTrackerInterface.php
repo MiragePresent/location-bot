@@ -27,6 +27,8 @@ interface StatsTrackerInterface
     public const REQUEST_TYPE_SERVICE_MESSAGE = 'service_message';
     /** Developer feature request */
     public const REQUEST_TYPE_DEV = 'dev';
+    /** Humanitarian help */
+    public const REQUEST_HUMANITARIAN_HELP = 'humanitarian_help';
 
     public const REQUEST_STATUS_UNKNOWN = 'unknown';
     public const REQUEST_STATUS_OK = 'ok';

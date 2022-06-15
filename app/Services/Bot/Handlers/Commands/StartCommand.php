@@ -2,11 +2,14 @@
 
 namespace App\Services\Bot\Handlers\Commands;
 
+use App\Services\Bot\Answer\HumanitarianHelpIntroAnswer;
 use App\Services\Bot\Handlers\AbstractCommandHandler;
 use App\Services\Bot\Answer\TextAnswer;
+use App\Services\Bot\Handlers\CallbackQuery\GetHumanitarianHelp;
 use App\Services\Bot\Tracker\StatsTrackerInterface;
 use TelegramBot\Api\Exception;
 use TelegramBot\Api\InvalidArgumentException;
+use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup;
 use TelegramBot\Api\Types\Message;
 
 /**
@@ -51,5 +54,7 @@ class StartCommand extends AbstractCommandHandler
 
         // Show help message
         HelpCommand::dispatch($this->bot, $message);
+
+        $this->bot->sendTo($message->getChat()->getId(), new HumanitarianHelpIntroAnswer());
     }
 }
