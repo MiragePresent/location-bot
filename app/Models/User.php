@@ -135,4 +135,11 @@ class User extends Model
             'created_at' => Carbon::now(),
         ]);
     }
+
+    public function isAdmin(): bool
+    {
+        $admins = explode(',', config('bot.admin_usernames'));
+
+        return in_array($this->username, $admins);
+    }
 }

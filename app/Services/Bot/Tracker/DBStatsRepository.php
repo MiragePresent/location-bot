@@ -40,7 +40,6 @@ class DBStatsRepository implements StatsRepositoryInterface
             ->where('sent_messages', '>', 1)
             ->count();
 
-
         return $showAddressesMessages - $incorrectLocationWarnings;
     }
 
