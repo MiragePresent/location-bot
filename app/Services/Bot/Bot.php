@@ -412,7 +412,6 @@ class Bot
     private function registerCommands()
     {
         foreach ($this->commands as $commandHandler) {
-
             /** @var CommandHandlerInterface $handler */
             $handler = new $commandHandler($this);
 
