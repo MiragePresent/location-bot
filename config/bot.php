@@ -10,6 +10,8 @@ return [
 
     'username_fallback' => env('BOT_USERNAME_FALLBACK', 'sda_church_bot'),
 
+    'admin_usernames' => env('BOT_ADMIN_USERNAMES', ''),
+
     /**
      * SDA objects API url
      */
