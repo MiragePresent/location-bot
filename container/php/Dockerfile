@@ -1,4 +1,4 @@
-FROM alpine:3.15.0 as base
+FROM alpine:3.16 as base
 
 RUN apk --no-cache add \
     php8 \
@@ -31,8 +31,7 @@ RUN mkdir -p /var/run/php8/
 
 ADD php-supervisor.ini /etc/supervisor.d/php-supervisor.ini
 
-RUN ln -s /usr/bin/php8 /usr/bin/php && \
-    ln -s /usr/sbin/php-fpm8 /usr/sbin/php-fpm
+RUN ln -s /usr/sbin/php-fpm8 /usr/sbin/php-fpm
 
 RUN rm -rf /etc/php8/php-fpm.d/
 COPY ./php-fpm.conf /etc/php8/
