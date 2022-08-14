@@ -1,40 +1,40 @@
 FROM alpine:3.16 as base
 
 RUN apk --no-cache add \
-    php8 \
-    php8-ctype \
-    php8-curl \
-    php8-fileinfo \
-    php8-iconv \
-    php8-json \
-    php8-mbstring \
-    php8-dom \
-    php8-xml \
-    php8-xmlwriter \
-    php8-pdo \
-    php8-pgsql \
-    php8-pdo_pgsql \
-    php8-openssl \
-    php8-phar \
-    php8-tokenizer \
-    php8-zlib \
-    php8-zip \
-    php8-opcache \
-    php8-fpm \
+    php81 \
+    php81-ctype \
+    php81-curl \
+    php81-fileinfo \
+    php81-iconv \
+    php81-json \
+    php81-mbstring \
+    php81-dom \
+    php81-xml \
+    php81-xmlwriter \
+    php81-pdo \
+    php81-pgsql \
+    php81-pdo_pgsql \
+    php81-openssl \
+    php81-phar \
+    php81-tokenizer \
+    php81-zlib \
+    php81-zip \
+    php81-opcache \
+    php81-fpm \
     supervisor
 
 RUN mkdir -p /var/log/supervisor
 RUN mkdir -p /var/run/php/
-RUN mkdir -p /var/run/php8-fpm/
-RUN mkdir -p /var/run/php-fpm8/
-RUN mkdir -p /var/run/php8/
+RUN mkdir -p /var/run/php-fpm81/
+RUN mkdir -p /var/run/php81/
 
 ADD php-supervisor.ini /etc/supervisor.d/php-supervisor.ini
 
-RUN ln -s /usr/sbin/php-fpm8 /usr/sbin/php-fpm
+RUN ln -s /usr/bin/php81 /usr/sbin/php  \
+    && ln -s /usr/sbin/php-fpm81 /usr/sbin/php-fpm
 
-RUN rm -rf /etc/php8/php-fpm.d/
-COPY ./php-fpm.conf /etc/php8/
+RUN rm -rf /etc/php81/php-fpm.d/
+COPY ./php-fpm.conf /etc/php81/
 
 WORKDIR /app
 
