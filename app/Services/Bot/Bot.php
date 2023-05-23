@@ -107,6 +107,7 @@ class Bot
         Commands\HelpCommand::class,
         Commands\FindCommand::class,
         Commands\StatsCommand::class,
+        Commands\StatsDetailedCommand::class,
     ];
 
     /**
