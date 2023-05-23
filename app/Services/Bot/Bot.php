@@ -11,6 +11,7 @@ use App\Services\Bot\Handlers\CommandHandlerInterface;
 use App\Services\Bot\Handlers\Commands;
 use App\Services\Bot\Handlers\InlineSearch;
 use App\Services\Bot\Handlers\KeyboardReply;
+use App\Services\Bot\Tool\UpdateTree;
 use App\Services\Bot\Tracker\StatsTrackerInterface;
 use App\Services\SdaStorage\StorageClient;
 use Closure;
@@ -237,9 +238,15 @@ class Bot
         $this->statsTracker->start($this->user);
 
         if (is_null($this->user)) {
-            $this->log('Update cannot be processed. User was not detected', 'error');
+            $this->log(
+                'Update cannot be processed. User was not detected',
+                'error',
+                ['username' => UpdateTree::getUser($update)->getUsername()]
+            );
 
-            $this->statsTracker->setRequestType(StatsTrackerInterface::REQUEST_STATUS_ERROR);
+            $this->statsTracker->setRequestType(StatsTrackerInterface::REQUEST_TYPE_UNKNOWN);
+            $this->statsTracker->setRequestStatus(StatsTrackerInterface::REQUEST_STATUS_ERROR);
+            $this->statsTracker->increaseFailures();
             $this->statsTracker->finish();
 
             return;

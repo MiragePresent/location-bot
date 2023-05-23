@@ -46,9 +46,10 @@ class DBStatsRepository implements StatsRepositoryInterface
     public function numberOfErrors(): int
     {
         return Statistics::query()
+            ->selectRaw('sum(failures) as count_errors')
             ->where('request_status', StatsTrackerInterface::REQUEST_STATUS_ERROR)
-            ->where('sent_messages', '>', 0)
-            ->count();
+            ->get()
+            ->count_errors;
     }
 
     public function getRequestsDetails(): array
