@@ -1,12 +1,6 @@
 name: PHPUnit Tests
 
-on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
+on: [pull_request]
 
 jobs:
     build:
@@ -15,10 +9,10 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@v3
+              uses: actions/checkout@v2
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@v3
+              uses: shivammathur/setup-php@v2
               with:
                   php-version: '8.1'
 
