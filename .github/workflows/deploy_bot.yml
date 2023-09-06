@@ -6,6 +6,7 @@ on: workflow_dispatch
 jobs:
   ssh-command:
     runs-on: ubuntu-latest
+    environment: PROD
 
     steps:
       - name: Checkout code
