@@ -14,9 +14,12 @@ jobs:
 
       - name: Run SSH command
         uses: appleboy/ssh-action@v1.0.0
+        env:
+          PROJECT_ROOT: ${{ secrets.PROJECT_ROOT }}
+          BOT_WEBHOOK: ${{ secrets.BOT_WEBHOOK }}
         with:
           host: ${{ secrets.SSH_HOST_IP }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: whoami
+          script: /bin/bash $PROJECT_ROOT/deploy.sh $PROJECT_ROOT $BOT_WEBHOOK -a -v
