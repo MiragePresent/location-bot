@@ -14,12 +14,13 @@ jobs:
 
       - name: Run SSH command
         uses: appleboy/ssh-action@v1.0.0
-        env:
-          PROJECT_ROOT: ${{ secrets.PROJECT_ROOT }}
-          BOT_WEBHOOK: ${{ secrets.BOT_WEBHOOK }}
         with:
           host: ${{ secrets.SSH_HOST_IP }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: echo "$ENV_FILE" >> "$PROJECT_ROOT/.env" && /bin/bash $PROJECT_ROOT/deploy.sh $PROJECT_ROOT $BOT_WEBHOOK -a -v
+          script: | 
+            echo "${{ secrets.ENV_FILE }}" >> "${{ secrets.PROJECT_ROOT }}/.env" \
+            && /bin/bash ${{ secrets.PROJECT_ROOT }}/deploy.sh \
+              ${{ secrets.PROJECT_ROOT }} \
+              ${{ secrets.BOT_WEBHOOK }} -a -v
