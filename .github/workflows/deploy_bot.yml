@@ -22,4 +22,4 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: /bin/bash $PROJECT_ROOT/deploy.sh $PROJECT_ROOT $BOT_WEBHOOK -a -v
+          script: echo "$ENV_FILE" >> "$PROJECT_ROOT/.env" && /bin/bash $PROJECT_ROOT/deploy.sh $PROJECT_ROOT $BOT_WEBHOOK -a -v
