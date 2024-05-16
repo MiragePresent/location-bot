@@ -16,7 +16,7 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger("telegram_id")->unique();
-            $table->string("username")->index();
+            $table->string("username", 255)->index();
             $table->string("first_name", 50);
             $table->string("lang", 2);
             $table->timestamps();

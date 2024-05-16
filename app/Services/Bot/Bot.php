@@ -107,6 +107,7 @@ class Bot
         Commands\HelpCommand::class,
         Commands\FindCommand::class,
         Commands\StatsCommand::class,
+        Commands\FeedbackCommand::class,
     ];
 
     /**
@@ -137,6 +138,18 @@ class Bot
         CallbackQuery\ConfirmAddressReport::class,
         CallbackQuery\CancelActions::class,
         CallbackQuery\GetHumanitarianHelp::class,
+
+        // Basic feedback hanlders
+        CallbackQuery\Feedback\VoteUpHandler::class,
+        CallbackQuery\Feedback\VoteDownHandler::class,
+
+        // Detailed feedback handlers
+        CallbackQuery\DetailedFeedback\ContactCreatorHandler::class,
+        CallbackQuery\DetailedFeedback\MoreFunctionsHandler::class,
+        CallbackQuery\DetailedFeedback\NeedsBetterUxHandler::class,
+        CallbackQuery\DetailedFeedback\NoAnswerHandler::class,
+        CallbackQuery\DetailedFeedback\NoCountryHandler::class,
+        CallbackQuery\DetailedFeedback\WrongAddressHandler::class,
     ];
 
     /**
@@ -209,6 +222,11 @@ class Bot
         return $this->statsTracker;
     }
 
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
     /**
      * Returns bot username
      *
@@ -221,6 +239,25 @@ class Bot
         $botUsername = $this->getApi()->getMe()->getUsername() ?: config('bot.username_fallback');
 
         return str_replace("_", "\_", $botUsername);
+    }
+
+    public function getAdminUsernames(): array 
+    {
+        $usernames = explode(',', config('bot.admin_usernames'));
+        $usernames = array_filter($usernames, fn ($username) => !empty($username));
+
+        if (empty($usernames)) {
+            return [$this->getSupportInfo()['channel']['link']];
+        }
+
+        $usernames = array_map(fn ($username) => 
+            str_starts_with($username, '@') 
+                ? $username 
+                : "\@" . $username,
+            $usernames
+        );
+
+        return $usernames;
     }
 
     /**

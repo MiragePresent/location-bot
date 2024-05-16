@@ -23,7 +23,7 @@ class CreateChurchPatchesTable extends Migration
                 ->onUpdate('cascade')
                 ->onUpdate('cascade');
 
-            $table->string('address')->nullable();
+            $table->string('address', 255)->nullable();
             $table->decimal('latitude')->nullable();
             $table->decimal('longitude')->nullable();
 

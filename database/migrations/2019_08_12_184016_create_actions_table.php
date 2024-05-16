@@ -25,7 +25,7 @@ class CreateActionsTable extends Migration
                 ->onDelete("cascade");
 
             $table->string("key", 50)->index();
-            $table->string("description")->nullable();
+            $table->string("description", 255)->nullable();
             $table->text("arguments")->nullable();
 
             // Multi steps actions
