@@ -20,6 +20,7 @@ class Kernel extends ConsoleKernel
         Commands\PatchChurchImport::class,
         Commands\PatchChurchGenerate::class,
         Commands\LocationsFixCommand::class,
+        Commands\SendPollMessages::class,
     ];
 
     /**
