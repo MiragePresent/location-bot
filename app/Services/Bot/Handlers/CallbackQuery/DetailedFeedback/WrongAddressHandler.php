@@ -14,5 +14,7 @@ class WrongAddressHandler extends AbstractDetailedFeedbackVoteHandler
         $answer = new HelpProjectAnswer($support['channel']['name'], $support['channel']['link']);
 
         $this->getBot()->sendTo($chat->getId(), $answer);
+
+        parent::sendNextMessage($chat);
     }
 }

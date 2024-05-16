@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
+use App\Models\PollAnswer;
 use App\Services\Bot\Answer\AskFeedbackMessage;
 use App\Services\Bot\Bot;
 use App\Services\Bot\UserPoll;
@@ -85,6 +86,12 @@ class SendPollMessages extends Command
         $bot->getLogger()->info("Sending basic feedback request message to user: " . $user->username);
         $bot->getStatsTracker()->start($user);
         $bot->sendTo($user->chat_id, new AskFeedbackMessage());
+
+        $userPoll = new PollAnswer();
+        $userPoll->user_id = $user->id;
+        $userPoll->poll_name = UserPoll::BasicFeedback->value;
+        $userPoll->answer = "message_sent";
+        $userPoll->save();
 
         return Command::SUCCESS;
     }

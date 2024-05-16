@@ -2,8 +2,10 @@
 
 namespace App\Services\Bot\Handlers\CallbackQuery\Feedback;
 
+use App\Models\PollAnswer;
 use App\Services\Bot\Answer\DetailedFeedbackMessage;
 use App\Services\Bot\Tool\UpdateTree;
+use App\Services\Bot\UserPoll;
 
 class VoteDownHandler extends AbstractFeedbackVoteHandler
 {
@@ -31,5 +33,11 @@ class VoteDownHandler extends AbstractFeedbackVoteHandler
         $this->getBot()->getLogger()->info("Asking user " . $this->getBot()->getUser()->username . " more details");
 
         $this->getBot()->sendTo(UpdateTree::getChat($update)->getId(), new DetailedFeedbackMessage());
+        
+        $userPoll = new PollAnswer();
+        $userPoll->user_id = $this->getBot()->getUser()->id;
+        $userPoll->poll_name = UserPoll::DetailedFeedback->value;
+        $userPoll->answer = "message_sent";
+        $userPoll->save();
     }
 }

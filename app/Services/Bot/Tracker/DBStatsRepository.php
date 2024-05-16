@@ -49,7 +49,7 @@ class DBStatsRepository implements StatsRepositoryInterface
             ->selectRaw('sum(failures) as count')
             ->where('request_status', StatsTrackerInterface::REQUEST_STATUS_ERROR)
             ->first()
-            ->count;
+            ->count ?: 0;
     }
 
     public function getRequestsDetails(): array

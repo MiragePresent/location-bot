@@ -50,6 +50,12 @@ abstract class AbstractDetailedFeedbackVoteHandler extends AbstractUpdateHandler
         $msg = new DetailedFeedbackMessage();
         $msg->hideButton($this->getCallbackData());
 
+        $userPoll = new PollAnswer();
+        $userPoll->user_id = $this->getBot()->getUser()->id;
+        $userPoll->poll_name = UserPoll::DetailedFeedback->value;
+        $userPoll->answer = "message_sent";
+        $userPoll->save();
+
         $this->getBot()->sendTo($chat->getId(), $msg);
     }
 
