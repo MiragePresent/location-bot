@@ -108,6 +108,7 @@ class Bot
         Commands\FindCommand::class,
         Commands\StatsCommand::class,
         Commands\FeedbackCommand::class,
+        Commands\SendMessagesCommand::class,
     ];
 
     /**
