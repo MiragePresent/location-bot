@@ -9,6 +9,7 @@ use App\Services\Bot\Bot;
 use App\Services\Bot\UserPoll;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class SendPollMessages extends Command
 {
@@ -83,6 +84,19 @@ class SendPollMessages extends Command
 
     protected function sendBasicAskFeedback(Bot $bot, User $user): int
     {
+        $sentRecently = PollAnswer::query()
+            ->where("poll_name", UserPoll::BasicFeedback->value)
+            ->where("answer", "message_sent")
+            ->where("user_id", $user->id)
+            ->where("created_at", ">", DB::raw("CURRENT_TIMESTAMP - interval '15 minutes'"))
+            ->exists();
+
+        if ($sentRecently) {
+            $bot->getLogger()->info("Feedback request has been sent recently. User: " . $user->username);
+            
+            return Command::SUCCESS;
+        }
+
         $bot->getLogger()->info("Sending basic feedback request message to user: " . $user->username);
         $bot->getStatsTracker()->start($user);
         $bot->sendTo($user->chat_id, new AskFeedbackMessage());
